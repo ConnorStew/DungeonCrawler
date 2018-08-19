@@ -2,20 +2,17 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include "stdafx.h"
 #include "Node.h"
 #include "Connection.h"
 #include "Key.h"
-#include <map>
-#include <vector>
-#include <list>
+
 
 /// <summary> A graph data structure used to map the connectiosn between nodes. </summary>
 class Graph {
 private:
 	/// <summary> The default weight assigned to new connections in the graph. </summary>
 	const int DEFAULT_WEIGHT = 0;
-	/// <summary> The last index assigned to a node. </summary>
-	int lastIndexAssigned = 0;
 	/// <summary> List of nodes in the graph. </summary>
 	std::map<Key, Node*> nodes;
 	/// <summary> List of nodes which are still being considered for the path. </summary>
@@ -34,7 +31,7 @@ public:
 	/// <summary> Adds a new index to the graph. </summary>
 	/// <param name="x">x coordinate</param>
 	/// <param name="y">y coordinate</param>
-	void addVertex(float x, float y);
+	void addNode(Node* node);
 
 	/// <summary> Adds a connection between two nodes. </summary>
 	/// <param name="n1">the first node</param>

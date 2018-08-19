@@ -1,18 +1,15 @@
 #include "stdafx.h"
 #include "Graph.h"
-#include <iostream>
 
 Graph::Graph(int size) {
 	//nodes.resize(size);
 	adjacencyList.resize(size);
 }
 
-void Graph::addVertex(float x, float y) {
-	Node* node = new Node(x, y, lastIndexAssigned);
-	Key key = Key(x, y);
+void Graph::addNode(Node* node) {
+	Key key = Key(node->getX(), node->getY());
 	std::pair<Key, Node*> pair = std::make_pair(key, node);
 	nodes.insert(pair);
-	lastIndexAssigned++;
 }
 
 void Graph::addConnection(Node* n1, Node* n2) {

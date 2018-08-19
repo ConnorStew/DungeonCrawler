@@ -22,12 +22,14 @@ public:
 	/// <summary> Creates a new node with the given x,y coordinates. </summary>
 	/// <param name="x">x coordinate</param>
 	/// <param name="y">y coordinate</param>
-	/// <param name="index">the index of this node</param>
-	Node(float x, float y, int index);
+	Node(int x, int y);
 
 	/// <summary> The index of this node. </summary>
 	/// <returns>The index of this node.</returns>
 	int getIndex();
+
+	int getX();
+	int getY();
 
 	/// <summary> Prints debug information about this node. </summary>
 	void printDebug();
