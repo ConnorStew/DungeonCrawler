@@ -29,3 +29,36 @@ Node* Graph::getNode(int x, int y) {
 std::vector<Connection*> Graph::getConnections(Node* node) {
 	return adjacencyList.at(node->getIndex());
 }
+
+void Graph::aStar(Node * start, Node * end){
+	
+}
+
+const std::vector<Node*> Graph::getOpenList() {
+	return openList;
+}
+
+const std::vector<Node*> Graph::getClosedList() {
+	return closedList;
+}
+
+const std::vector<Node*> Graph::getPath() {
+	return path;
+}
+
+void Graph::addToClosedList(Node * node) {
+	closedList.push_back(node);
+}
+
+void Graph::addToOpenList(Node * node) {
+	openList.push_back(node);
+}
+
+void Graph::addToPathList(Node * node) {
+	path.push_back(node);
+}
+
+const std::map<Key, Node*> Graph::getNodes() {
+	return nodes;
+}
+

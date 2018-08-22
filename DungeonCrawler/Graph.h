@@ -36,7 +36,19 @@ public:
 	void addConnection(Node* n1, Node* n2);
 
 	Node* getNode(int x, int y);
+	
 	std::vector<Connection*> getConnections(Node* node);
+
+	void aStar(Node* start, Node* end);
+
+	const std::map<Key, Node*> getNodes();
+	const std::vector<Node*> getOpenList();
+	const std::vector<Node*> getClosedList();
+	const std::vector<Node*> getPath();
+
+	void addToClosedList(Node* node);
+	void addToOpenList(Node* node);
+	void addToPathList(Node* node);
 };
 
 #endif
