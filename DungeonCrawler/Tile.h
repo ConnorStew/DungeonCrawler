@@ -2,18 +2,13 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "Key.h"
+#include "stdafx.h"
 #include "Node.h"
 
-class Tile : public Node, public sf::CircleShape {
-	private:
-		float width, height, worldX, worldY;
-		Key* key;
-		bool filled;
-		
+class Tile : public sf::RectangleShape, public Node {
 	public:
-		Tile(float graphX, float graphY);
-
+		Tile(std::pair<int, int> location, int index);
+		friend bool operator==(const Tile& lhs, const Tile& rhs);
 };
 
 #endif

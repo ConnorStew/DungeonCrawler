@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "Tile.h"
 
-Tile::Tile(float graphX, float graphY) : Node(graphX, graphY), sf::CircleShape(20, 6) {
+Tile::Tile(std::pair<int, int> location, int index) : sf::RectangleShape(), Node(location, index) {}
+
+bool operator==(const Tile& lhs, const Tile& rhs) {
+	return lhs.location == rhs.location;
 }

@@ -8,11 +8,7 @@ class Connection;
 
 class Node {
 private:
-	/// <summary> The nodes x coordinate. </summary>
-	float x;
-
-	/// <summary> The nodes y coordinate. </summary>
-	float y;
+	
 
 	/// <summary> This nodes distance from the starting node. </summary>
 	float g;
@@ -26,23 +22,31 @@ private:
 	/// <summary> The index in the graphs arrays this node is stored in. </summary>
 	int index;
 
-	/// <summary> A list of connections to this node. </summary>
-	std::vector<Connection*> connections;
+	std::shared_ptr<Node> parent;
 
 public:
 	/// <summary> Creates a new node with the given x,y coordinates. </summary>
 	/// <param name="x">x coordinate</param>
 	/// <param name="y">y coordinate</param>
-	Node(int x, int y);
+	Node(std::pair<int, int> location, int index);
 
 	int getX();
 	int getY();
+	float getG();
+	float getH();
+	float getF();
+	
+	void updateScore(std::shared_ptr<Node> parent, float f, float g, float h);
+
+	void setParent(std::shared_ptr<Node> parent);
+
 	int getIndex();
+	
+	std::shared_ptr<Node> getParent();
 
-	void setIndex(int index);
-
-	/// <summary> Prints debug information about this node. </summary>
-	void printDebug();
+protected:
+	std::pair<int, int> location;
+	std::pair<int, int> getLocation();
 };
 
 #endif

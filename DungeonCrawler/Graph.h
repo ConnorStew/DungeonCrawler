@@ -4,51 +4,61 @@
 
 #include "stdafx.h"
 #include "Node.h"
-#include "Connection.h"
-#include "Key.h"
 
+/*
 /// <summary> A graph data structure used to map the connectiosn between nodes. </summary>
 class Graph {
 private:
 	/// <summary> The last index assigned to a node. </summary>
 	int lastIndexAssigned = 0;
 	/// <summary> List of nodes in the graph. </summary>
-	std::map<Key, Node*> nodes;
+	std::map<std::pair<int, int>, std::shared_ptr<Node>> nodes;
 	/// <summary> List of nodes which are still being considered for the path. </summary>
-	std::vector<Node*> openList;
+	std::vector<std::shared_ptr<Node>> openList;
 	/// <summary> List of nodes which are not being considered for the path. </summary>
-	std::vector<Node*> closedList;
+	std::vector<std::shared_ptr<Node>> closedList;
 	/// <summary> List of nodes which create the shortest path. </summary>
-	std::vector<Node*> path;
+	std::vector<std::shared_ptr<Node>> path;
 	/// <summary>  Vector of lists containing connection between nodes. </summary>
-	std::vector<std::vector<Connection*>> adjacencyList;
+	std::vector<std::vector<std::shared_ptr<Connection>>> adjacencyList;
+
+	std::shared_ptr<Node> startNode;
+	std::shared_ptr<Node> endNode;
 public:
 	/// <summary> Creates a new graph. </summary>
 	/// <param name="size">The amount of elements to store in the graph.</param>
 	Graph(int size);
 
 	/// <summary> Adds a new index to the graph. </summary>
-	void addNode(Node * node);
+	void addNode(std::shared_ptr<Node> node);
 
 	/// <summary> Adds a connection between two nodes. </summary>
 	/// <param name="n1">the first node</param>
 	/// <param name="n2">the second node</param>
-	void addConnection(Node* n1, Node* n2);
+	void addConnection(std::shared_ptr<Node> n1, std::shared_ptr<Node> n2);
 
-	Node* getNode(int x, int y);
+	std::shared_ptr<Node> getNode(int x, int y);
 	
-	std::vector<Connection*> getConnections(Node* node);
+	std::vector<std::shared_ptr<Connection>> getConnections(std::shared_ptr<Node> node);
 
-	void aStar(Node* start, Node* end);
+	void aStar();
 
-	const std::map<Key, Node*> getNodes();
-	const std::vector<Node*> getOpenList();
-	const std::vector<Node*> getClosedList();
-	const std::vector<Node*> getPath();
+	void clear();
 
-	void addToClosedList(Node* node);
-	void addToOpenList(Node* node);
-	void addToPathList(Node* node);
+	const std::map<std::pair<int, int>, std::shared_ptr<Node>> getNodes();
+	const std::vector<std::shared_ptr<Node>> getOpenList();
+	const std::vector<std::shared_ptr<Node>> getClosedList();
+	const std::vector<std::shared_ptr<Node>> getPath();
+	const std::shared_ptr<Node> getStartNode();
+	const std::shared_ptr<Node> getEndNode();
+	void setStartNode(std::shared_ptr<Node> node);
+	void setEndNode(std::shared_ptr<Node> node);
+
+	void addToClosedList(std::shared_ptr<Node> node);
+	void addToOpenList(std::shared_ptr<Node> node);
+	void addToPathList(std::shared_ptr<Node> node);
 };
+*/
+
 
 #endif
