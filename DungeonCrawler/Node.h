@@ -9,7 +9,6 @@ class Connection;
 class Node {
 private:
 	
-
 	/// <summary> This nodes distance from the starting node. </summary>
 	float g;
 
@@ -19,34 +18,32 @@ private:
 	/// <summary> The node score based on g and h. </summary>
 	float f;
 
-	/// <summary> The index in the graphs arrays this node is stored in. </summary>
-	int index;
+	bool filled;
 
-	std::shared_ptr<Node> parent;
+	std::pair<int, int> parentLoc;
 
 public:
+
 	/// <summary> Creates a new node with the given x,y coordinates. </summary>
 	/// <param name="x">x coordinate</param>
 	/// <param name="y">y coordinate</param>
-	Node(std::pair<int, int> location, int index);
+	Node(std::pair<int, int> gridLoc, bool filled);
 
-	int getX();
-	int getY();
 	float getG();
 	float getH();
 	float getF();
 	
-	void updateScore(std::shared_ptr<Node> parent, float f, float g, float h);
-
-	void setParent(std::shared_ptr<Node> parent);
-
-	int getIndex();
+	void updateScore(std::pair<int, int> parentLoc, float f, float g, float h);
+	void setParent(std::pair<int, int> parentLoc);
 	
-	std::shared_ptr<Node> getParent();
+	std::pair<int,int> getParent();
+	bool getFilled();
+
+	std::pair<int, int> getGridLoc();
 
 protected:
-	std::pair<int, int> location;
-	std::pair<int, int> getLocation();
+	std::pair<int, int> gridLocation;
+	
 };
 
 #endif
