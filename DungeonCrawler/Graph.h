@@ -3,62 +3,80 @@
 #define GRAPH_H
 
 #include "stdafx.h"
-#include "Node.h"
 
-/*
-/// <summary> A graph data structure used to map the connectiosn between nodes. </summary>
+/// <summary> A graph data structure used to map the connectiosn between nodes. </summary> 
+template <class T, int size>
 class Graph {
-private:
-	/// <summary> The last index assigned to a node. </summary>
-	int lastIndexAssigned = 0;
-	/// <summary> List of nodes in the graph. </summary>
-	std::map<std::pair<int, int>, std::shared_ptr<Node>> nodes;
-	/// <summary> List of nodes which are still being considered for the path. </summary>
-	std::vector<std::shared_ptr<Node>> openList;
-	/// <summary> List of nodes which are not being considered for the path. </summary>
-	std::vector<std::shared_ptr<Node>> closedList;
-	/// <summary> List of nodes which create the shortest path. </summary>
-	std::vector<std::shared_ptr<Node>> path;
-	/// <summary>  Vector of lists containing connection between nodes. </summary>
-	std::vector<std::vector<std::shared_ptr<Connection>>> adjacencyList;
+	private:
+		std::vector<std::shared_ptr<T>> openList;
+		std::vector<std::shared_ptr<T>> closedList;
+		std::vector<std::shared_ptr<T>> path;
+		std::vector<std::shared_ptr<T>> adjList[size][size];
+		std::shared_ptr<T> nodes[size][size];
+	public:
 
-	std::shared_ptr<Node> startNode;
-	std::shared_ptr<Node> endNode;
-public:
-	/// <summary> Creates a new graph. </summary>
-	/// <param name="size">The amount of elements to store in the graph.</param>
-	Graph(int size);
+		class RightDeref {
+		private:
+			int leftIndex;
+			int rightIndex;
+			Graph *graph;
 
-	/// <summary> Adds a new index to the graph. </summary>
-	void addNode(std::shared_ptr<Node> node);
+		public:
 
-	/// <summary> Adds a connection between two nodes. </summary>
-	/// <param name="n1">the first node</param>
-	/// <param name="n2">the second node</param>
-	void addConnection(std::shared_ptr<Node> n1, std::shared_ptr<Node> n2);
+			RightDeref(Graph *graph, int leftIndex, int rightIndex) {
+				this->leftIndex = leftIndex;
+				this->rightIndex = rightIndex;
+				this->graph = graph;
+			}
+			
+			operator std::shared_ptr<T>() {
+				return graph->nodes[leftIndex][rightIndex];
+			}
 
-	std::shared_ptr<Node> getNode(int x, int y);
-	
-	std::vector<std::shared_ptr<Connection>> getConnections(std::shared_ptr<Node> node);
+			std::shared_ptr<T> operator->() const
+			{
+				return graph->nodes[leftIndex][rightIndex];
+			}
+			
+			std::shared_ptr<T> operator=(const std::shared_ptr<T>& other) {
+				return this->graph->nodes[leftIndex][rightIndex] = other;
+			}
+		};
 
-	void aStar();
 
-	void clear();
+		class LeftDeref {
+			private:
+				int index;
+				Graph *graph;
 
-	const std::map<std::pair<int, int>, std::shared_ptr<Node>> getNodes();
-	const std::vector<std::shared_ptr<Node>> getOpenList();
-	const std::vector<std::shared_ptr<Node>> getClosedList();
-	const std::vector<std::shared_ptr<Node>> getPath();
-	const std::shared_ptr<Node> getStartNode();
-	const std::shared_ptr<Node> getEndNode();
-	void setStartNode(std::shared_ptr<Node> node);
-	void setEndNode(std::shared_ptr<Node> node);
+			public:
 
-	void addToClosedList(std::shared_ptr<Node> node);
-	void addToOpenList(std::shared_ptr<Node> node);
-	void addToPathList(std::shared_ptr<Node> node);
+				LeftDeref(Graph *graph, int index) {
+					this->index = index;
+					this->graph = graph;
+				}
+
+				//the first [] operator returns a left return object
+				RightDeref operator[](const int index) {
+					return RightDeref(graph, this->index, index); //pass the x array
+				}
+		};
+
+
+
+		//the first [] operator returns a left return object
+		LeftDeref operator[](const int index) {
+			return LeftDeref(this, index); //pass the x array
+		}
+
+		
+		std::shared_ptr<T> operator()(int x, int y) {
+			return graph->nodes[x][y];
+		}
+		
+		//graph[LEFTRETURN][RIGHTRETURN] = 
+		
 };
-*/
 
 
 #endif

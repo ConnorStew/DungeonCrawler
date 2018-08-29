@@ -169,7 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DungeonCrawler.cpp" />
-    <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
