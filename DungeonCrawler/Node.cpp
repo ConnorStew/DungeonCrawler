@@ -25,6 +25,21 @@ std::pair<int, int> Node::getGridLoc() {
 	return gridLocation;
 }
 
+int Node::gridX()
+{
+	return gridLocation.first;
+}
+
+int Node::gridY()
+{
+	return gridLocation.second;
+}
+
+void Node::setFilled(bool set)
+{
+	filled = set;
+}
+
 void Node::updateScore(std::pair<int, int> parentLoc, float f, float g, float h) {
 	this->f = f;
 	this->g = g;

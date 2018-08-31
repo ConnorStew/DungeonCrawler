@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 
-class Connection;
-
 class Node {
 private:
 	
@@ -40,6 +38,11 @@ public:
 	bool getFilled();
 
 	std::pair<int, int> getGridLoc();
+
+	int gridX();
+	int gridY();
+
+	void setFilled(bool set);
 
 protected:
 	std::pair<int, int> gridLocation;
