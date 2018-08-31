@@ -61,6 +61,14 @@ class Graph {
 				}
 		};
 
+		void clearConnections(int x, int y) {
+		}
+
+		void clear() {
+			openList.clear();
+			closedList.clear();
+			path.clear();
+		}
 
 		//the first [] operator returns a left return object
 		LeftDeref operator[](const int index) {
@@ -100,9 +108,7 @@ class Graph {
 		}
 
 		void aStar(std::shared_ptr<T> start, std::shared_ptr<T> end) {
-			openList.clear();
-			closedList.clear();
-			path.clear();
+			clear();
 
 			openList.push_back(start);
 
