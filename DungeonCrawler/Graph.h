@@ -4,105 +4,135 @@
 
 #include "stdafx.h"
 
+using std::shared_ptr;
+using std::vector;
+
 /// <summary> A graph data structure used to map the connectiosn between nodes. </summary> 
 template <class T, int size>
 class Graph {
+	
 	private:
-		std::vector<std::shared_ptr<T>> openList;
-		std::vector<std::shared_ptr<T>> closedList;
-		std::vector<std::shared_ptr<T>> path;
-		std::vector<std::shared_ptr<T>> adjList[size][size];
-		std::shared_ptr<T> nodes[size][size];
+		/// <summary> A list of nodes still being considered for the path. </summary>
+		vector<shared_ptr<T>> openList;
+
+		/// <summary> A list of nodes not being considered for the path. </summary>
+		vector<shared_ptr<T>> closedList;
+
+		/// <summary> A list of nodes on the path. </summary>
+		vector<shared_ptr<T>> path;
+
+		/// <summary> A list of nodes connected to this node. </summary>
+		vector<shared_ptr<T>> adjList[size][size];
+
+		/// <summary> The nodes stored in the graph. </summary>
+		shared_ptr<T> nodes[size][size];
+
+		class YDeref {
+			private:
+				int xIndex;
+				int yIndex;
+				Graph *graph;
+			public:
+				YDeref(Graph *graph, int xIndex, int yIndex) {
+					this->xIndex = xIndex;
+					this->yIndex = yIndex;
+					this->graph = graph;
+				}
+				operator shared_ptr<T>() {
+					return graph->nodes[xIndex][yIndex];
+				}
+
+				shared_ptr<T> operator->() {
+					return graph->nodes[xIndex][yIndex];
+				}
+
+				shared_ptr<T> operator=(const shared_ptr<T> other) {
+					return graph->nodes[xIndex][yIndex] = other;
+				}
+		};
+
+		class XDeref {
+			private:
+				int xIndex;
+				Graph *graph;
+			public:
+				XDeref(Graph *graph, int xIndex) {
+					this->xIndex = xIndex;
+					this->graph = graph;
+				}
+
+				YDeref operator[](const int index) {
+					return YDeref(graph, xIndex, index);
+				}
+		};
+
 	public:
-
-		class RightDeref {
-			private:
-				int leftIndex;
-				int rightIndex;
-				Graph *graph;
-
-			public:
-
-				RightDeref(Graph *graph, int leftIndex, int rightIndex) {
-					this->leftIndex = leftIndex;
-					this->rightIndex = rightIndex;
-					this->graph = graph;
-				}
-			
-				operator std::shared_ptr<T>() {
-					return graph->nodes[leftIndex][rightIndex];
-				}
-
-				std::shared_ptr<T> operator->() const
-				{
-					return graph->nodes[leftIndex][rightIndex];
-				}
-			
-				std::shared_ptr<T> operator=(const std::shared_ptr<T>& other) {
-					return this->graph->nodes[leftIndex][rightIndex] = other;
-				}
-		};
-
-		class LeftDeref {
-			private:
-				int index;
-				Graph *graph;
-
-			public:
-
-				LeftDeref(Graph *graph, int index) {
-					this->index = index;
-					this->graph = graph;
-				}
-
-				//the first [] operator returns a left return object
-				RightDeref operator[](const int index) {
-					return RightDeref(graph, this->index, index); //pass the x array
-				}
-		};
-
+		/// <summary> Clears the graph. </summary>
 		void clear() {
 			openList.clear();
 			closedList.clear();
 			path.clear();
 		}
 
-		//the first [] operator returns a left return object
-		LeftDeref operator[](const int index) {
-			return LeftDeref(this, index); //pass the x array
+		/// <summary>
+		/// Allows the access of the nodes through [x][y] syntax.
+		/// </summary>
+		/// <param name="index">The x index of the node.</param>
+		/// <returns>An XDeref class which allows you to return the node at the y index.</returns>
+		XDeref operator[](const int index) {
+			return XDeref(this, index); //pass the x array
 		}
 
-		
-		std::shared_ptr<T> operator()(int x, int y) {
-			return graph->nodes[x][y];
-		}
-		
-		std::vector<std::shared_ptr<T>> * adj(int x, int y) {
-			return &adjList[x][y];
+		/// <summary>
+		/// Allows you to access a list of adjacent nodes from the node at the x,y index.
+		/// </summary>
+		/// <param name="x">The nodes grid x coordinate.</param>
+		/// <param name="y">The nodes grid y coordinate.</param>
+		/// <returns>A list of nodes adjacent to the given grid position.</returns>
+		vector<shared_ptr<T>>& adj(int x, int y) {
+			return adjList[x][y];
 		}
 
-		bool inOpenList(std::shared_ptr<T> node) {
+		/// <summary>
+		/// Checks if a node is in the open list.
+		/// </summary>
+		/// <param name="node">The node to check.</param>
+		/// <returns>Whether the node is in the list.</returns>
+		bool inOpenList(shared_ptr<T> node) {
 			return std::find(openList.begin(), openList.end(), node) != openList.end();
 		}
 
-		bool inClosedList(std::shared_ptr<T> node) {
+		/// <summary>
+		/// Checks if a node is in the closed list.
+		/// </summary>
+		/// <param name="node">The node to check.</param>
+		/// <returns>Whether the node is in the list.</returns>
+		bool inClosedList(shared_ptr<T> node) {
 			return std::find(closedList.begin(), closedList.end(), node) != closedList.end();
 		}
 
-		bool inPathList(std::shared_ptr<T> node) {
+		/// <summary>
+		/// Checks if a node is in the path list.
+		/// </summary>
+		/// <param name="node">The node to check.</param>
+		/// <returns>Whether the node is in the list.</returns>
+		bool inPathList(shared_ptr<T> node) {
 			return std::find(path.begin(), path.end(), node) != path.end();
 		}
 
-		void aStar(std::shared_ptr<T> start, std::shared_ptr<T> end) {
+		/// <summary>
+		/// Runs the A* algorithm to get a path from the start to end node.
+		/// </summary>
+		/// <param name="start">Starting node.</param>
+		/// <param name="end">Target node.</param>
+		void aStar(shared_ptr<T> start, shared_ptr<T> end) {
 			clear();
-
 			openList.push_back(start);
 
 			while (!openList.empty()) {
 
-				if (std::find(openList.begin(), openList.end(), end) != openList.end()) {
-
-					std::shared_ptr<T> &current = end;
+				if (inOpenList(end)) {
+					shared_ptr<T> &current = end;
 					path.push_back(current);
 
 					do {
@@ -112,40 +142,43 @@ class Graph {
 						path.push_back(current);
 					} while (current != start);
 
-
 					std::cout << "found goal node" << std::endl;
 					return;
 				}
 
 				//get lowest nodes
-				std::vector<std::shared_ptr<T>> lowestVertices = std::vector<std::shared_ptr<T>>();
+				vector<shared_ptr<T>> lowestVertices = vector<shared_ptr<T>>();
 				float lowestScore = std::numeric_limits<float>::max();
 
-				for (std::shared_ptr<T> node : openList)
+				for (shared_ptr<T> node : openList)
 					if (node->getF() < lowestScore)
 						lowestScore = node->getF();
 
-				for (std::shared_ptr<T> node : openList)
+				for (shared_ptr<T> node : openList)
 					if (node->getF() == lowestScore)
 						lowestVertices.push_back(node);
 
-				for (std::shared_ptr<T> node : lowestVertices) {
+				for (shared_ptr<T> node : lowestVertices) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(2));
 					std::lock_guard<std::mutex> lock(mutex);
 
 					closedList.push_back(node);
 					openList.erase(std::remove(openList.begin(), openList.end(), node), openList.end());
 
-					for (std::shared_ptr<T> neighbour : adjList[node->getGridX()][node->getGridY()]) {
-						if (!(std::find(openList.begin(), openList.end(), neighbour) != openList.end()) && !(std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())) {
-							if (std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())
-								continue;
+					for (shared_ptr<T> neighbour : adjList[node->getGridX()][node->getGridY()]) {
+						if (!inClosedList(neighbour)) {
 
+							//the tile distance away
 							float tentativeG = node->getG() + std::abs(node->getGridX() - neighbour->getGridX()) + std::abs(node->getGridY() - neighbour->getGridY());
-							float tentativeH = std::abs(end->getGridX() - neighbour->getGridX()) + std::abs(end->getGridY() - neighbour->getGridY());
+
+							//hueristic distance the world distance away in pixels
+							float tentativeH = std::abs(end->getWorldX() - neighbour->getWorldX()) + std::abs(end->getWorldY() - neighbour->getWorldY());
+
+							//total the distance metrics
 							float tentativeScore = (tentativeG + tentativeH);
 
-							if (!(std::find(openList.begin(), openList.end(), neighbour) != openList.end())) {
+							//add to open list and update score if not in open list
+							if (!inOpenList(neighbour)) {
 								openList.insert(openList.begin(), neighbour);
 								neighbour->updateScore(node->getGridX(), node->getGridY(), tentativeScore, tentativeG, tentativeH);
 							}
@@ -156,7 +189,6 @@ class Graph {
 							}
 						}
 					}
-
 				}
 			}
 		}

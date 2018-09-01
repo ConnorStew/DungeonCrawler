@@ -5,7 +5,7 @@
     },
     "size": 32,
     "start": {
-        "x": 9,
+        "x": 4,
         "y": 26
     },
     "tiles": {
@@ -694,7 +694,7 @@
             "filled": false
         },
         "15,12": {
-            "filled": false
+            "filled": true
         },
         "15,13": {
             "filled": true
@@ -787,10 +787,10 @@
             "filled": true
         },
         "16,11": {
-            "filled": false
+            "filled": true
         },
         "16,12": {
-            "filled": false
+            "filled": true
         },
         "16,13": {
             "filled": true
@@ -913,10 +913,10 @@
             "filled": false
         },
         "17,20": {
-            "filled": false
+            "filled": true
         },
         "17,21": {
-            "filled": false
+            "filled": true
         },
         "17,22": {
             "filled": true
@@ -985,22 +985,22 @@
             "filled": false
         },
         "18,13": {
-            "filled": false
+            "filled": true
         },
         "18,14": {
-            "filled": false
+            "filled": true
         },
         "18,15": {
-            "filled": false
+            "filled": true
         },
         "18,16": {
-            "filled": false
+            "filled": true
         },
         "18,17": {
-            "filled": false
+            "filled": true
         },
         "18,18": {
-            "filled": false
+            "filled": true
         },
         "18,19": {
             "filled": false
@@ -1081,22 +1081,22 @@
             "filled": false
         },
         "19,13": {
-            "filled": false
+            "filled": true
         },
         "19,14": {
-            "filled": false
+            "filled": true
         },
         "19,15": {
-            "filled": false
+            "filled": true
         },
         "19,16": {
-            "filled": false
+            "filled": true
         },
         "19,17": {
-            "filled": false
+            "filled": true
         },
         "19,18": {
-            "filled": false
+            "filled": true
         },
         "19,19": {
             "filled": false
@@ -1945,10 +1945,10 @@
             "filled": false
         },
         "27,13": {
-            "filled": true
+            "filled": false
         },
         "27,14": {
-            "filled": true
+            "filled": false
         },
         "27,15": {
             "filled": false
@@ -2041,10 +2041,10 @@
             "filled": false
         },
         "28,13": {
-            "filled": true
+            "filled": false
         },
         "28,14": {
-            "filled": true
+            "filled": false
         },
         "28,15": {
             "filled": false
