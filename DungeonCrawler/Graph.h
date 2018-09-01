@@ -61,9 +61,6 @@ class Graph {
 				}
 		};
 
-		void clearConnections(int x, int y) {
-		}
-
 		void clear() {
 			openList.clear();
 			closedList.clear();
@@ -80,19 +77,8 @@ class Graph {
 			return graph->nodes[x][y];
 		}
 		
-		std::vector<std::shared_ptr<T>> adj(int x, int y) {
-			return adjList[x][y];
-		}
-
-		void connect(int x1, int y1, int x2, int y2) {
-			if (x1 < size && x1 >= 0 && y1 < size && y1 >= 0) {
-				if (x2 < size && x2 >= 0 && y2 < size && y2 >= 0) {
-					if (!nodes[x1][y1]->getFilled() && !nodes[x2][y2]->getFilled()) {
-						adjList[x1][y1].push_back(nodes[x2][y2]);
-						adjList[x1][y1].push_back(nodes[x2][y2]);
-					}
-				}
-			}
+		std::vector<std::shared_ptr<T>> * adj(int x, int y) {
+			return &adjList[x][y];
 		}
 
 		bool inOpenList(std::shared_ptr<T> node) {
@@ -122,7 +108,7 @@ class Graph {
 					do {
 						std::this_thread::sleep_for(std::chrono::milliseconds(2));
 						std::lock_guard<std::mutex> lock(mutex);
-						current = nodes[current->getParent().first][current->getParent().second];
+						current = nodes[current->getParentX()][current->getParentY()];
 						path.push_back(current);
 					} while (current != start);
 
@@ -150,23 +136,23 @@ class Graph {
 					closedList.push_back(node);
 					openList.erase(std::remove(openList.begin(), openList.end(), node), openList.end());
 
-					for (std::shared_ptr<T> neighbour : adjList[node->getGridLoc().first][node->getGridLoc().second]) {
+					for (std::shared_ptr<T> neighbour : adjList[node->getGridX()][node->getGridY()]) {
 						if (!(std::find(openList.begin(), openList.end(), neighbour) != openList.end()) && !(std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())) {
 							if (std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end())
 								continue;
 
-							float tentativeG = node->getG() + std::abs(node->getGridLoc().first - neighbour->getGridLoc().first) + std::abs(node->getGridLoc().second - neighbour->getGridLoc().second);
-							float tentativeH = std::abs(end->getGridLoc().first - neighbour->getGridLoc().first) + std::abs(end->getGridLoc().second - neighbour->getGridLoc().second);
+							float tentativeG = node->getG() + std::abs(node->getGridX() - neighbour->getGridX()) + std::abs(node->getGridY() - neighbour->getGridY());
+							float tentativeH = std::abs(end->getGridX() - neighbour->getGridX()) + std::abs(end->getGridY() - neighbour->getGridY());
 							float tentativeScore = (tentativeG + tentativeH);
 
 							if (!(std::find(openList.begin(), openList.end(), neighbour) != openList.end())) {
 								openList.insert(openList.begin(), neighbour);
-								neighbour->updateScore(node->getGridLoc(), tentativeScore, tentativeG, tentativeH);
+								neighbour->updateScore(node->getGridX(), node->getGridY(), tentativeScore, tentativeG, tentativeH);
 							}
 
 							//update the score of the neighbouring vertex
 							if (tentativeScore < neighbour->getF()) {
-								neighbour->updateScore(node->getGridLoc(), tentativeScore, tentativeG, tentativeH);
+								neighbour->updateScore(node->getGridX(), node->getGridY(), tentativeScore, tentativeG, tentativeH);
 							}
 						}
 					}

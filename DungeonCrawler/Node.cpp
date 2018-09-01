@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "Node.h"
 
-Node::Node(std::pair<int, int> gridLoc, bool filled) {
+Node::Node(int gridX, int gridY, bool filled) {
 	this->filled = filled;
-	this->gridLocation = gridLoc;
+	this->gridX = gridX;
+	this->gridY = gridY;
 	this->g = 0;
 	this->h = 0;
 	this->f = std::numeric_limits<float>::max();
@@ -21,18 +22,20 @@ float Node::getF() {
 	return f;
 }
 
-std::pair<int, int> Node::getGridLoc() {
-	return gridLocation;
+int Node::getGridX() {
+	return gridX;
 }
 
-int Node::gridX()
-{
-	return gridLocation.first;
+int Node::getGridY() {
+	return gridY;
 }
 
-int Node::gridY()
-{
-	return gridLocation.second;
+int Node::getParentX() {
+	return parentX;
+}
+
+int Node::getParentY() {
+	return parentY;
 }
 
 void Node::setFilled(bool set)
@@ -40,19 +43,17 @@ void Node::setFilled(bool set)
 	filled = set;
 }
 
-void Node::updateScore(std::pair<int, int> parentLoc, float f, float g, float h) {
+void Node::updateScore(int parentX, int parentY, float f, float g, float h) {
 	this->f = f;
 	this->g = g;
 	this->h = h;
-	this->parentLoc = parentLoc;
+	this->parentX = parentX;
+	this->parentY = parentY;
 }
 
-void Node::setParent(std::pair<int, int> parentLoc) {
-	this->parentLoc = parentLoc;
-}
-
-std::pair<int, int> Node::getParent() {
-	return parentLoc;
+void Node::setParent(int parentX, int parentY) {
+	this->parentX = parentX;
+	this->parentY = parentY;
 }
 
 bool Node::getFilled() {
