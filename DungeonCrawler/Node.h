@@ -5,47 +5,46 @@
 #include "stdafx.h"
 
 class Node {
-private:
-	
-	/// <summary> This nodes distance from the starting node. </summary>
-	float g;
+	private:
+		/// <summary> This nodes distance from the starting node. </summary>
+		float g;
 
-	/// <summary> This nodes heuristic distance from the starting node. </summary>
-	float h;
+		/// <summary> This nodes heuristic distance from the starting node. </summary>
+		float h;
 
-	/// <summary> The node score based on g and h. </summary>
-	float f;
+		/// <summary> The node score based on g and h. </summary>
+		float f;
 
-	bool filled;
+		bool filled;
 
-	std::pair<int, int> parentLoc;
+		int parentX;
 
-public:
+		int parentY;
 
-	/// <summary> Creates a new node with the given x,y coordinates. </summary>
-	/// <param name="x">x coordinate</param>
-	/// <param name="y">y coordinate</param>
-	Node(std::pair<int, int> gridLoc, bool filled);
+	public:
 
-	float getG();
-	float getH();
-	float getF();
-	
-	void updateScore(std::pair<int, int> parentLoc, float f, float g, float h);
-	void setParent(std::pair<int, int> parentLoc);
-	
-	std::pair<int,int> getParent();
-	bool getFilled();
+		/// <summary> Creates a new node with the given x,y coordinates. </summary>
+		/// <param name="x">x coordinate</param>
+		/// <param name="y">y coordinate</param>
+		Node(int gridX, int gridY, bool filled);
 
-	std::pair<int, int> getGridLoc();
+		float getG();
+		float getH();
+		float getF();
+		int getGridX();
+		int getGridY();
+		int getParentX();
+		int getParentY();
+		bool getFilled();
 
-	int gridX();
-	int gridY();
+		void updateScore(int parentX, int parentY, float f, float g, float h);
+		void setParent(int parentX, int parentY);
 
-	void setFilled(bool set);
+		void setFilled(bool set);
 
-protected:
-	std::pair<int, int> gridLocation;
+	protected:
+		int gridX;
+		int gridY;
 	
 };
 
