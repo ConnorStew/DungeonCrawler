@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\JSON\include;E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\JSON\include;E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories);E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\entities;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\graph;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\ui;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\maps</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories);E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories);E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,7 +148,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories);E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,25 +161,33 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DungeonCrawler.h" />
-    <ClInclude Include="Graph.h" />
-    <ClInclude Include="Node.h" />
+    <ClInclude Include="include\entities\Entity.h" />
+    <ClInclude Include="include\graph\Graph.h" />
+    <ClInclude Include="include\graph\Node.h" />
+    <ClInclude Include="include\maps\Map.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Tile.h" />
+    <ClInclude Include="include\ui\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DungeonCrawler.cpp" />
-    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="src\entities\Entity.cpp" />
+    <ClCompile Include="src\graph\Node.cpp" />
+    <ClCompile Include="src\maps\Map.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="src\ui\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="map.json" />
+    <None Include="resources\map.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\mage.png" />
+    <Image Include="resources\player_mage_sheet.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "Node.h"
 
-Node::Node(int gridX, int gridY, bool filled) {
+Node::Node(int gridX, int gridY, float worldX, float worldY, bool filled) {
 	this->filled = filled;
 	this->gridX = gridX;
 	this->gridY = gridY;
+	this->worldX = worldX;
+	this->worldY = worldY;
 	this->g = 0;
 	this->h = 0;
 	this->f = std::numeric_limits<float>::max();
@@ -38,8 +40,7 @@ int Node::getParentY() {
 	return parentY;
 }
 
-void Node::setFilled(bool set)
-{
+void Node::setFilled(bool set) {
 	filled = set;
 }
 
@@ -58,4 +59,12 @@ void Node::setParent(int parentX, int parentY) {
 
 bool Node::getFilled() {
 	return filled;
+}
+
+float Node::getWorldX() {
+	return worldX;
+}
+
+float Node::getWorldY() {
+	return worldY;
 }
