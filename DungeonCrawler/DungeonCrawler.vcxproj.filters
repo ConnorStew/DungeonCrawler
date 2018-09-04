@@ -35,7 +35,7 @@
       <UniqueIdentifier>{a653ebde-5921-479a-bd6a-36b78ca2d351}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Maps">
-      <UniqueIdentifier>{e5f740d8-d223-433c-9da0-e678883836f3}</UniqueIdentifier>
+      <UniqueIdentifier>{ee0c743e-8933-43d7-9f1c-f002c2970a8c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +54,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="DungeonCrawler.h" />
-    <ClInclude Include="include\maps\Map.h">
+    <ClInclude Include="include\maps\TileMap.h">
       <Filter>Header Files\Maps</Filter>
     </ClInclude>
   </ItemGroup>
@@ -70,7 +70,7 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="DungeonCrawler.cpp" />
-    <ClCompile Include="src\maps\Map.cpp">
+    <ClCompile Include="src\maps\TileMap.cpp">
       <Filter>Source Files\Maps</Filter>
     </ClCompile>
   </ItemGroup>
