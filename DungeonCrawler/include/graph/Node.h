@@ -4,6 +4,10 @@
 
 #include "stdafx.h"
 
+using std::shared_ptr;
+using std::pair;
+using std::vector;
+
 class Node {
 	private:
 		/// <summary> This nodes distance from the starting node. </summary>
@@ -21,12 +25,13 @@ class Node {
 
 		int parentY;
 
+		float worldX;
+
+		float worldY;
+
 	public:
 
-		/// <summary> Creates a new node with the given x,y coordinates. </summary>
-		/// <param name="x">x coordinate</param>
-		/// <param name="y">y coordinate</param>
-		Node(int gridX, int gridY, bool filled);
+		Node(int gridX, int gridY, float worldX, float worldY, bool filled);
 
 		float getG();
 		float getH();
@@ -36,6 +41,8 @@ class Node {
 		int getParentX();
 		int getParentY();
 		bool getFilled();
+		float getWorldX();
+		float getWorldY();
 
 		void updateScore(int parentX, int parentY, float f, float g, float h);
 		void setParent(int parentX, int parentY);

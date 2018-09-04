@@ -25,43 +25,65 @@
     <Filter Include="Source Files\Graph">
       <UniqueIdentifier>{819573a8-2ef0-4b30-9348-163e08c3f4f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Entities">
+      <UniqueIdentifier>{87ccabfc-8f00-440b-8f42-85d80702b630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entities">
+      <UniqueIdentifier>{3c4e5bc3-aa72-4ac3-bd7b-fc0a3e505742}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Maps">
+      <UniqueIdentifier>{a653ebde-5921-479a-bd6a-36b78ca2d351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Maps">
+      <UniqueIdentifier>{e5f740d8-d223-433c-9da0-e678883836f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graph.h">
+    <ClInclude Include="include\graph\Graph.h">
       <Filter>Header Files\Graph</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
+    <ClInclude Include="include\graph\Node.h">
       <Filter>Header Files\Graph</Filter>
     </ClInclude>
-    <ClInclude Include="DungeonCrawler.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\entities\Entity.h">
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="Tile.h">
+    <ClInclude Include="include\ui\Tile.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="DungeonCrawler.h" />
+    <ClInclude Include="include\maps\Map.h">
+      <Filter>Header Files\Maps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DungeonCrawler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Node.cpp">
+    <ClCompile Include="src\graph\Node.cpp">
       <Filter>Source Files\Graph</Filter>
     </ClCompile>
-    <ClCompile Include="Tile.cpp">
+    <ClCompile Include="src\ui\Tile.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entities\Entity.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="DungeonCrawler.cpp" />
+    <ClCompile Include="src\maps\Map.cpp">
+      <Filter>Source Files\Maps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="map.json">
+    <Image Include="resources\player_mage_sheet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\mage.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\map.json">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
