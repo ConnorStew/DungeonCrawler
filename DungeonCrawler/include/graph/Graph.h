@@ -59,7 +59,6 @@ private:
 				}
 
 				return false;
-				//return lhs, rhs) == 0; 
 			}
 
 			bool operator==(YDeref* rhs) {
@@ -112,12 +111,88 @@ private:
 			}
 	};
 
+	/// <summary>
+	/// Connects tiles to the tile at x,y to the tile at x + xIncrease, y + yIncrease.
+	/// </summary>
+	/// <param name="x">X coordinate of node1.</param>
+	/// <param name="y">Y coordinate of node1.</param>
+	/// <param name="xIncrease">X distance of node2 away from node1.</param>
+	/// <param name="yIncrease">Y distance of node2 away from node1.</param>
+	void connectIfValid(int x, int y, int xIncrease, int yIncrease) {
+		if (getNode(x,y) != nullptr && getNode(x + xIncrease, y + yIncrease) != nullptr) {
+			if (!getNode(x,y)->getFilled() && !getNode(x + xIncrease,y + yIncrease)->getFilled()) {
+				adj(x, y).push_back(getNode(x + xIncrease,y + yIncrease));
+				adj(x + xIncrease, y + yIncrease).push_back(getNode(x,y));
+			}
+		}
+	}
+
+	/// <summary>
+	/// Easy method to find nodes within the graph header.
+	/// </summary>
+	/// <param name="x">X position.</param>
+	/// <param name="y">Y position.</param>
+	/// <returns></returns>
+	shared_ptr<T> getNode(int x, int y) {
+		typename std::map<pair<int, int>, shared_ptr<T>>::iterator it;
+		it = nodes.find(std::make_pair(x, y));
+		if (it != nodes.end())
+			return it->second;
+		else
+			return nullptr;
+	}
+
 public:
 	/// <summary> Clears the graph. </summary>
 	void clear() {
 		openList.clear();
 		closedList.clear();
 		path.clear();
+	}
+
+	/// <summary>
+	/// Adds connections for the given tile.
+	/// </summary>
+	/// <param name="tile">The tile to add connections to.</param>
+	void addConnections(int x, int y, bool diagonal) {
+		connectIfValid(x, y, 1, 0); //right
+		connectIfValid(x, y, -1, 0); //left
+		connectIfValid(x, y, 0, 1); //up
+		connectIfValid(x, y, 0, -1); //down
+
+		if (diagonal) {
+			connectIfValid(x, y, 1, -1); //bottom right
+			connectIfValid(x, y, 1, 1); //top right
+			connectIfValid(x, y, -1, -1); //bottom left
+			connectIfValid(x, y, -1, 1); //top left
+		}
+	}
+
+	/// <summary>
+	/// Clears the connections which involve the given tile.
+	/// </summary>
+	/// <param name="tile">The tile to remove the connections of.</param>
+	void clearConnections(int x, int y) {
+		shared_ptr<T> node = nullptr;
+		auto it = nodes.find(std::make_pair(x, y));
+		if (it != nodes.end())
+			node = it->second;
+
+		vector<shared_ptr<T>>& connectedTiles = adj(x,y);
+
+		for (int i = 0; i < connectedTiles.size(); i++) {
+			shared_ptr<T>& connectedTile = connectedTiles.at(i);
+			//std::cout << *connectedTile << std::endl; //dereference pointer
+
+			//remove the original tile from the connected tiles connections
+			vector<shared_ptr<T>>& adjList = adj(connectedTile->getGridX(), connectedTile->getGridY());
+			auto it = std::find(adjList.begin(), adjList.end(), node);
+			if (it != adjList.end()) {
+				adjList.erase(it);
+			}
+		}
+
+		connectedTiles.clear();
 	}
 
 	/// <summary>
@@ -178,6 +253,9 @@ public:
 		return std::find(path.begin(), path.end(), node) != path.end();
 	}
 
+	map<pair<int, int>, shared_ptr<T>> getNodes() {
+		return nodes;
+	}
 	
 
 	/// <summary>

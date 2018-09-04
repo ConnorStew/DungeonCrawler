@@ -164,7 +164,7 @@
     <ClInclude Include="include\entities\Entity.h" />
     <ClInclude Include="include\graph\Graph.h" />
     <ClInclude Include="include\graph\Node.h" />
-    <ClInclude Include="include\maps\Map.h" />
+    <ClInclude Include="include\maps\TileMap.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="include\ui\Tile.h" />
@@ -173,7 +173,7 @@
     <ClCompile Include="DungeonCrawler.cpp" />
     <ClCompile Include="src\entities\Entity.cpp" />
     <ClCompile Include="src\graph\Node.cpp" />
-    <ClCompile Include="src\maps\Map.cpp" />
+    <ClCompile Include="src\maps\TileMap.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
