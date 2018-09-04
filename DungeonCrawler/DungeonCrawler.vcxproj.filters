@@ -57,6 +57,9 @@
     <ClInclude Include="include\maps\TileMap.h">
       <Filter>Header Files\Maps</Filter>
     </ClInclude>
+    <ClInclude Include="include\entities\Player.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\graph\Node.cpp">
@@ -72,6 +75,9 @@
     <ClCompile Include="DungeonCrawler.cpp" />
     <ClCompile Include="src\maps\TileMap.cpp">
       <Filter>Source Files\Maps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entities\Player.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

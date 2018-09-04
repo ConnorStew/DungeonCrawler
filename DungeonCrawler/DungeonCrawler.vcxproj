@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\Programs\VSWorkspace\Libraries\JSON\include;E:\Programs\VSWorkspace\Libraries\SFML-VS\include;%(AdditionalIncludeDirectories);E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\entities;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\graph;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\ui;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\maps</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);E:\Programs\VSWorkspace\Libraries\JSON\include;E:\Programs\VSWorkspace\Libraries\SFML-VS\include;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\entities;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\graph;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\ui;E:\Programs\VSWorkspace\DungeonCrawler\DungeonCrawler\include\maps</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -165,6 +165,7 @@
     <ClInclude Include="include\graph\Graph.h" />
     <ClInclude Include="include\graph\Node.h" />
     <ClInclude Include="include\maps\TileMap.h" />
+    <ClInclude Include="include\entities\Player.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="include\ui\Tile.h" />
@@ -172,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="DungeonCrawler.cpp" />
     <ClCompile Include="src\entities\Entity.cpp" />
+    <ClCompile Include="src\entities\Player.cpp" />
     <ClCompile Include="src\graph\Node.cpp" />
     <ClCompile Include="src\maps\TileMap.cpp" />
     <ClCompile Include="stdafx.cpp">

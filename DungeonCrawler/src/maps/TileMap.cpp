@@ -75,6 +75,11 @@ TileMap::TileMap(string fileLocation, Graph<Tile> &graph) : graph(graph) {
 	}
 
 	in.close();
+
+	//add connections
+	for (int x = 0; x < size; x++)
+		for (int y = 0; y < size; y++)
+			graph.addConnections(x, y, DIAGONAL_MOVEMENT);
 }
 
 void TileMap::save() {
