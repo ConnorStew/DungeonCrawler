@@ -157,6 +157,18 @@ public:
 		return std::find(closedList.begin(), closedList.end(), node) != closedList.end();
 	}
 
+	const vector<shared_ptr<T>>& getOpenList() {
+		return openList;
+	}
+
+	const vector<shared_ptr<T>>& getClosedList() {
+		return closedList;
+	}
+
+	const vector<shared_ptr<T>>& getPathList() {
+		return path;
+	}
+
 	/// <summary>
 	/// Checks if a node is in the path list.
 	/// </summary>
@@ -165,6 +177,8 @@ public:
 	bool inPathList(shared_ptr<T> node) {
 		return std::find(path.begin(), path.end(), node) != path.end();
 	}
+
+	
 
 	/// <summary>
 	/// Runs the A* algorithm to get a path from the start to end node.
