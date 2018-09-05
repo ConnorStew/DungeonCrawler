@@ -5,8 +5,11 @@
 #include "Tile.h"
 
 using std::shared_ptr;
+using std::vector;
 
-Player::Player(string spriteLocation, int gridX, int gridY, int width, int height, Graph<Tile>& graph) : Entity(spriteLocation, gridX, gridY, width, height), graph(graph) {}
+Player::Player(string spriteLocation, int gridX, int gridY, int width, int height, Graph<Tile>& graph) : Entity(spriteLocation, gridX, gridY, width, height), graph(graph) {
+	pathing = false;
+}
 
 void Player::updateControls() {
 	bool wDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W);
@@ -32,10 +35,34 @@ void Player::updateControls() {
 	setPosition(playerTile->getWorldX(), playerTile->getWorldY());
 }
 
+void Player::path(vector<shared_ptr<Tile>> pathList) {
+	if (!pathList.empty()) {
+		pathing = true;
+		this->pathList = pathList;
+	}
+}
+
 void Player::move(int xIncrease, int yIncrease) {
 	shared_ptr<Tile> tile = graph[gridX + xIncrease][gridY + yIncrease];
 	if (tile != nullptr && !tile->getFilled()) {
 		gridX = gridX + xIncrease;
 		gridY = gridY + yIncrease;
+	}
+}
+
+bool Player::isPathing() {
+	return pathing;
+}
+
+void Player::advancePath() {
+	if (!pathList.empty()) {
+		shared_ptr<Tile> tile = pathList.back();
+		pathList.pop_back();
+
+		gridX = tile->getGridX();
+		gridY = tile->getGridY();
+		setPosition(tile->getWorldX(), tile->getWorldY());
+	} else {
+		pathing = false;
 	}
 }

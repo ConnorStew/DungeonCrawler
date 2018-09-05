@@ -263,7 +263,7 @@ public:
 	/// </summary>
 	/// <param name="start">Starting node.</param>
 	/// <param name="end">Target node.</param>
-	void aStar(shared_ptr<T> start, shared_ptr<T> end) {
+	vector<shared_ptr<T>> aStar(shared_ptr<T> start, shared_ptr<T> end) {
 		clear();
 		openList.push_back(start);
 
@@ -273,14 +273,14 @@ public:
 				shared_ptr<T> &current = end;
 				path.push_back(current);
 
-				do {
+				while (current != start) {
 					//std::lock_guard<std::mutex> lock(mutex);
 					current = nodes[std::make_pair(current->getParentX(),current->getParentY())];
 					path.push_back(current);
-				} while (current != start);
+				}
 
 				std::cout << "found goal node" << std::endl;
-				return;
+				return path;
 			}
 
 			//get lowest nodes
@@ -327,6 +327,8 @@ public:
 				}
 			}
 		}
+
+		return path;
 	}
 };
 
