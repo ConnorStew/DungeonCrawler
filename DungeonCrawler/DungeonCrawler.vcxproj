@@ -190,6 +190,7 @@
   <ItemGroup>
     <Image Include="resources\mage.png" />
     <Image Include="resources\player_mage_sheet.png" />
+    <Image Include="resources\skeleton.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

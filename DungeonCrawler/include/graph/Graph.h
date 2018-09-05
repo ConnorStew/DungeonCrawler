@@ -271,15 +271,12 @@ public:
 
 			if (inOpenList(end)) {
 				shared_ptr<T> &current = end;
-				path.push_back(current);
 
 				while (current != start) {
-					//std::lock_guard<std::mutex> lock(mutex);
-					current = nodes[std::make_pair(current->getParentX(),current->getParentY())];
 					path.push_back(current);
+					current = nodes[std::make_pair(current->getParentX(),current->getParentY())];
 				}
 
-				std::cout << "found goal node" << std::endl;
 				return path;
 			}
 
