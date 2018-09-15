@@ -15,10 +15,10 @@ void MoveTo::act(Entity &entity) {
 
 		Graph<Tile> graph = entity.getGraph();
 		pathList = graph.aStar(entity.getGridX(), entity.getGridY(), destX, destY);
-		std::cout << "Adding new path." << std::endl;
+		std::cout << entity.getFriendlyName() << ": beginning pathing to " << destX << ", " << destY << ";" << std::endl;
 
 		if (pathList.empty()) {
-			std::cout << "No path avialible." << std::endl;
+			std::cout << entity.getFriendlyName() << ":Cannot find path to " << destX << ", " << destY << std::endl;
 			state = FAILURE;
 		}
 	}
@@ -27,7 +27,7 @@ void MoveTo::act(Entity &entity) {
 		shared_ptr<Tile> tile = pathList.back();
 		pathList.pop_back();
 
-		std::cout << "Adding pathing to " << *tile << std::endl;
+		//std::cout << "\t" << tile->getGridX() << ", " << tile->getGridY() << std::endl;
 
 		entity.setGridX(tile->getGridX());
 		entity.setGridY(tile->getGridY());
@@ -37,4 +37,9 @@ void MoveTo::act(Entity &entity) {
 			state = SUCCESS;
 		}
 	}
+
+}	
+
+std::string MoveTo::getName() {
+    return "MoveTo";
 }

@@ -19,9 +19,9 @@ protected:
 	Graph<Tile> &graph;
 	bool pathing;
 	Routine* routine;
-
+	string friendlyName;
 public:
-	Entity(string spriteLocation, int gridX, int gridY, int width, int height, Graph<Tile>& graph);
+	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>& graph);
 	int getGridX();
 	int getGridY();
 	void setGridX(int gridX);
@@ -29,10 +29,8 @@ public:
 	void setRoutine(Routine* routine);
 	void update();
 
-	void path(vector<shared_ptr<Tile>> path);
-	bool isPathing();
-	void advancePath();
 	Graph<Tile> getGraph();
+	string getFriendlyName();
 };
 
 #endif

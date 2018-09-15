@@ -26,8 +26,13 @@ public:
 
 	virtual void act(Entity &entity) = 0;
 
+	virtual ~Routine() {}
+
+	virtual std::string getName() = 0;
+
 protected:
 	RoutineState state;
+
 };
 
 #endif

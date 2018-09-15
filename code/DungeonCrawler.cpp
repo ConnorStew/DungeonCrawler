@@ -8,6 +8,7 @@
 #include "Sequence.h"
 #include "Wander.h"
 #include "Graph.h"
+#include "Selector.h"
 
 using std::shared_ptr;
 using std::vector;
@@ -39,8 +40,8 @@ const bool DRAW_PATH = false;
 
 shared_ptr<Tile> targetTile = nullptr;
 
-Player player("res/mage.png", 5, 5, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
-Entity skeleton("res/skeleton.png", 28, 28, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
+Player player("res/mage.png", "Player", 5, 5, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
+Entity skeleton("res/skeleton.png", "Skeleton", 28, 28, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
 
 void update() {
 
@@ -57,14 +58,6 @@ void update() {
 	bool sDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
 	bool leftClick = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
 
-	if (updateClock.getElapsedTime().asMilliseconds() > 50) {
-		if (player.isPathing()) {
-			player.advancePath();
-		}
-
-		updateClock.restart();
-	}
-
 	if (controlDown && sDown)
 		gameMap.save();
 
@@ -73,7 +66,7 @@ void update() {
 			shared_ptr<Tile> tile = graph[x][y];
 
 			if (leftClick && tile->getGlobalBounds().contains(mousePos)) {
-				player.path(graph.aStar(player.getGridX(), player.getGridY(), x, y));
+				//player.path(graph.aStar(player.getGridX(), player.getGridY(), x, y));
 			}
 
 			if (eDown && tile->getGlobalBounds().contains(mousePos)) {
@@ -179,12 +172,13 @@ int main() {
 	skeletonClock.restart();
 
 	player.setRoutine(new Sequence { 
-		new MoveTo(21, 25), 
-		new Sequence {
-			new MoveTo(8, 8),
+		new MoveTo(21, 25),
+		new Selector {
+			new MoveTo(1, 1),
 			new MoveTo(21,28),
 			new MoveTo(2,22)
-		}
+		},
+		new Wander()
 	});
 
 	skeleton.setRoutine(new Wander());
@@ -196,8 +190,7 @@ int main() {
 			if (event.type == sf::Event::Closed)
 				window.close();
 
-		
-		if (updateClock.getElapsedTime().asMilliseconds() > 10) {
+		if (updateClock.getElapsedTime().asMilliseconds() > 50) {
 			player.update();
 			updateClock.restart();
 		}

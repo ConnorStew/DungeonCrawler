@@ -5,7 +5,7 @@
 using std::shared_ptr;
 using std::vector;
 
-Player::Player(string spriteLocation, int gridX, int gridY, int width, int height, Graph<Tile>& graph) : Entity(spriteLocation, gridX, gridY, width, height, graph) {
+Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>& graph) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, graph) {
 	pathing = false;
 }
 

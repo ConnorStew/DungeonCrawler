@@ -47,3 +47,7 @@ void Wander::act(Entity & entity) {
 		}
 	}
 }
+
+std::string Wander::getName() {
+    return "Wander";
+}

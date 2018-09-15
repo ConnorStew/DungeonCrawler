@@ -12,14 +12,12 @@ using std::vector;
 ///  </summary>
 class Sequence : public Routine {
 private:
-	vector<Routine*> *routines;
+	vector<Routine*> routines;
 
 public:
 	Sequence(std::initializer_list<Routine*> routines) {
-		this->routines = new vector<Routine*>;
-		for (Routine* routine : routines)
-			this->routines->push_back(routine);
-
+		std::cout << getName() + " initialised." << std::endl;
+		this->routines = routines;
 		state = RUNNING;
 	}
 
@@ -27,33 +25,44 @@ public:
 		if (state == RUNNING) {
 
 			bool allSucceeded = true;
-			for (unsigned int i = 0; i < routines->size(); i++) {
-				Routine* routine = routines->at(i);
+			for (unsigned int i = 0; i < routines.size(); i++) {
+				Routine* routine = routines.at(i);
 
 				if (routine->getState() != SUCCESS) {
 					allSucceeded = false;
 					routine->act(entity);
 
 					if (routine->getState() == FAILURE) {
-						delete routines;
 						state = FAILURE;
+						std::cout << getName() + " routines have all failed." << std::endl;
+						for (unsigned int i = 0; i < this->routines.size(); i++) {
+							Routine* back = routines.back();
+							routines.pop_back();
+							delete back;
+						}
 						return;
 					}
 					break;
 				}
 			}
 
-			
 			//check for faliures and success
-
-
 			if (allSucceeded) {
 				state = SUCCESS;
-				delete routines;
+				std::cout << getName() + " has succeeded." << std::endl;
+				for (unsigned int i = 0; i < this->routines.size(); i++) {
+					Routine* back = routines.back();
+					routines.pop_back();
+					delete back;
+				}
 				return;
 			}
 		}
 	}
+
+	std::string getName() {
+        return "Sequence";
+    }
 };
 
 #endif

@@ -15,6 +15,7 @@ private:
 public:
 	Wander();
 	void act(Entity &entity);
+	std::string getName();
 };
 
 #endif

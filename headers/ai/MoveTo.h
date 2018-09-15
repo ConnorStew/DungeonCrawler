@@ -16,6 +16,7 @@ public:
 	MoveTo(int destX, int destY);
 
 	void act(Entity &entity);
+	std::string getName();
 };
 
 #endif
