@@ -134,8 +134,9 @@ private:
 	/// <param name="y">Y position.</param>
 	/// <returns></returns>
 	shared_ptr<T> getNode(int x, int y) {
+		pair<int, int> myPair = std::make_pair(x,y);
 		typename std::map<pair<int, int>, shared_ptr<T>>::iterator it;
-		it = nodes.find(std::make_pair(x, y));
+		it = nodes.find(myPair);
 		if (it != nodes.end())
 			return it->second;
 		else
@@ -143,6 +144,15 @@ private:
 	}
 
 public:
+
+	Graph() {
+		std::cout << "here" << std::endl;
+	}
+
+	void addNode(int x, int y, shared_ptr<T> node) {
+		nodes.insert(std::make_pair(std::make_pair(x,y), node));
+	}
+
 	/// <summary> Clears the graph. </summary>
 	void clear() {
 		openList.clear();
@@ -257,6 +267,9 @@ public:
 		return nodes;
 	}
 	
+	shared_ptr<T> at(int x, int y) {
+		return getNode(x,y);
+	}
 
 	/// <summary>
 	/// Runs the A* algorithm to get a path from the start to end node.

@@ -43,7 +43,7 @@ private:
 	shared_ptr<Tile> end;
 
 	/// <summary> The graph to add tiles to. </summary>
-	Graph<Tile> &graph;
+	Graph<Tile>* graph;
 
 public:
 	/// <summary>
@@ -52,7 +52,7 @@ public:
 	/// </summary>
 	/// <param name="fileLocation">The location to save/load the map from.</param>
 	/// <param name="graph">The graph object to pass the loaded tiles to.</param>
-	TileMap(string fileLocation, Graph<Tile> &graph);
+	TileMap(string fileLocation, Graph<Tile>* graph);
 
 	/// <summary> Saves the tile to the given fileLocation. </summary>
 	void save();

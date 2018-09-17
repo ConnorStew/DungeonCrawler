@@ -5,12 +5,12 @@
 using std::shared_ptr;
 using std::vector;
 
-Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>& graph) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, graph) {
+Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>* graph) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, graph) {
 	pathing = false;
 }
 
 void Player::move(int xIncrease, int yIncrease) {
-	shared_ptr<Tile> tile = graph[gridX + xIncrease][gridY + yIncrease];
+	shared_ptr<Tile> tile = graph->at(gridX + xIncrease,gridY + yIncrease);
 	if (tile != nullptr && !tile->getFilled()) {
 		gridX = gridX + xIncrease;
 		gridY = gridY + yIncrease;

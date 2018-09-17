@@ -17,7 +17,7 @@ using std::vector;
 //std::mutex mutex;
 
 /// <summary> Graph which stores tiles. </summary>
-Graph<Tile> graph;
+Graph<Tile>* graph = new Graph<Tile>();
 
 /// <summary> The games map. </summary>
 TileMap gameMap("res/map.json", graph);
@@ -43,6 +43,7 @@ shared_ptr<Tile> targetTile = nullptr;
 Player player("res/mage.png", "Player", 5, 5, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
 Entity skeleton("res/skeleton.png", "Skeleton", 28, 28, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
 
+/*
 void update() {
 
 	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -117,9 +118,8 @@ void update() {
 			}
 		}
 	}
-
-
 }
+*/
 
 void render() {
 
@@ -128,7 +128,7 @@ void render() {
 	//fpsClock.restart();
 	//std::cout << std::to_string(framerate) << std::endl;
 
-	for (auto const& tileEntry : graph.getNodes()) {
+	for (auto const& tileEntry : graph->getNodes()) {
 		shared_ptr<Tile> tile = tileEntry.second;
 		tile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 
@@ -145,20 +145,20 @@ void render() {
 	}
 
 	if (DRAW_PATH) {
-		for (shared_ptr<Tile> tile : graph.getOpenList())
+		for (shared_ptr<Tile> tile : graph->getOpenList())
 			if (tile != gameMap.getStart() && tile != gameMap.getEnd()) //don't cover start and end
 				tile->setFillColor(sf::Color::Green);
 
-		for (shared_ptr<Tile> tile : graph.getClosedList())
+		for (shared_ptr<Tile> tile : graph->getClosedList())
 			if (tile != gameMap.getStart() && tile != gameMap.getEnd()) //don't cover start and end
 				tile->setFillColor(sf::Color::Red);
 
-		for (shared_ptr<Tile> tile : graph.getPathList())
+		for (shared_ptr<Tile> tile : graph->getPathList())
 			if (tile != gameMap.getStart() && tile != gameMap.getEnd()) //don't cover start and end
 				tile->setFillColor(sf::Color::Magenta);
 	}
 
-	for (auto const& tileEntry : graph.getNodes())
+	for (auto const& tileEntry : graph->getNodes())
 		window.draw(*tileEntry.second);
 
 
@@ -168,18 +168,26 @@ void render() {
 }
 
 int main() {
+	std::cout << "here" << std::endl;
 	updateClock.restart();
 	skeletonClock.restart();
 
-	player.setRoutine(new Sequence { 
+	player.setRoutine(new Sequence {
 		new MoveTo(21, 25),
+		new MoveTo(21, 24),
 		new Selector {
-			new MoveTo(1, 1),
-			new MoveTo(21,28),
-			new MoveTo(2,22)
+			new MoveTo(16, 1),
+			new MoveTo(50, 28),
+			new MoveTo(2, 22)
 		},
 		new Wander()
 	});
+
+	// player.setRoutine(
+	// 	new Selector {
+	// 		new MoveTo(50,1)
+	// 	}
+	// );
 
 	skeleton.setRoutine(new Wander());
 

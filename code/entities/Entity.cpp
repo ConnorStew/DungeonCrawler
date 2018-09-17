@@ -3,11 +3,12 @@
 
 using std::string;
 
-Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>& graph) : graph(graph) {
+Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile> * graph) {
 	this->spriteLocation = spriteLocation;
 	this->gridX = gridX;
 	this->gridY = gridY;
 	this->friendlyName = friendlyName;
+	this->graph = graph;
 
 	if (!texture.loadFromFile(spriteLocation))
 		std::cout << "Can't load sprite at " << spriteLocation << std::endl;
@@ -15,7 +16,7 @@ Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY,
 	setTexture(texture);
 	setScale(width / getLocalBounds().width, height / getLocalBounds().height);
 
-	shared_ptr<Tile> entityTile = graph[gridX][gridY];
+	shared_ptr<Tile> entityTile = graph->at(gridX, gridY);
 	setPosition(entityTile->getWorldX(), entityTile->getWorldY());
 }
 
@@ -39,15 +40,15 @@ void Entity::setRoutine(Routine* routine) {
 	this->routine = routine;
 }
 
-Graph<Tile> Entity::getGraph() {
+Graph<Tile>* Entity::getGraph() {
 	return graph;
 }
 
 void Entity::update() {
 	if (routine != nullptr)
-		routine->act(*this);
+		routine->act(this);
 
-	shared_ptr<Tile> entityTile = graph[gridX][gridY];
+	shared_ptr<Tile> entityTile = graph->at(gridX,gridY);
 	setPosition(entityTile->getWorldX(), entityTile->getWorldY());
 }
 
