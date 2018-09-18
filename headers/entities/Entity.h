@@ -31,6 +31,7 @@ public:
 
 	Graph<Tile>* getGraph();
 	string getFriendlyName();
+	~Entity();
 };
 
 #endif

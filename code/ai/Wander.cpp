@@ -15,6 +15,8 @@ void Wander::validateMove(Entity * entity, int xIncrease, int yIncrease) {
 	if (targetTile != nullptr && !targetTile->getFilled()) {
 		entity->setGridX(targetX);
 		entity->setGridY(targetY);
+		shared_ptr<Tile> entityTile = graph->at(entity->getGridX(),entity->getGridY());
+		entity->setPosition(entityTile->getWorldX(), entityTile->getWorldY());
 	}
 }
 

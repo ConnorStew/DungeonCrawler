@@ -8,7 +8,7 @@ using std::string;
 using std::shared_ptr;
 
 TileMap::TileMap(string fileLocation, Graph<Tile>* graph) {
-	
+	this->graph = graph;
 	this->size = DEFAULT_SIZE;
 	this->fileLocation = fileLocation;
 	
@@ -46,14 +46,6 @@ TileMap::TileMap(string fileLocation, Graph<Tile>* graph) {
 				graph->at(x,y)->setFilled(true);
 			}
 		}
-
-		int startX = map["start"]["x"];
-		int startY = map["start"]["y"];
-		int endX = map["end"]["x"];
-		int endY = map["end"]["y"];
-
-		start = graph->at(startX,startY);
-		end = graph->at(endX,endY);
 	}
 	else {
 		std::cout << "Cannot load map at " << fileLocation << " generating default map." << std::endl;
@@ -84,20 +76,13 @@ TileMap::TileMap(string fileLocation, Graph<Tile>* graph) {
 }
 
 void TileMap::save() {
-	json map = { { "size", size },
-		{ "start",{
-			{ "x", start->getGridX() },
-		{ "y", start->getGridY() }
-		} },
-		{ "end",{
-			{ "x", end->getGridX() },
-		{ "y", end->getGridY() }
-		} },
-	};
+	json map = {{ "size", size }};
 
 	for (int x = 0; x < size; x++) {
 		for (int y = 0; y < size; y++) {
-			map["tiles"][(std::to_string(x) + "," + std::to_string(y))]["filled"] = graph->at(x,y)->getFilled();
+			std::shared_ptr<Tile> tile = graph->at(x,y);
+			bool tileFilled = tile->getFilled();
+			map["tiles"][(std::to_string(x) + "," + std::to_string(y))]["filled"] = tileFilled;
 		}
 	}
 
@@ -135,20 +120,4 @@ int TileMap::getWidth() {
 
 int TileMap::getHeight() {
 	return (size *  TILE_SIZE.y) + (size * Y_SPACING) - Y_SPACING;
-}
-
-shared_ptr<Tile>& TileMap::getEnd() {
-	return end;
-}
-
-shared_ptr<Tile>& TileMap::getStart() {
-	return start;
-}
-
-void TileMap::setStart(shared_ptr<Tile> start) {
-	this->start = start;
-}
-
-void TileMap::setEnd(shared_ptr<Tile> end) {
-	this->end = end;
 }

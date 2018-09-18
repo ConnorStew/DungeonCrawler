@@ -145,10 +145,6 @@ private:
 
 public:
 
-	Graph() {
-		std::cout << "here" << std::endl;
-	}
-
 	void addNode(int x, int y, shared_ptr<T> node) {
 		nodes.insert(std::make_pair(std::make_pair(x,y), node));
 	}

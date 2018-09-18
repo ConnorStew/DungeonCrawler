@@ -14,6 +14,7 @@ public:
 
 	/** @brief The state of the routine. */
 	enum RoutineState {
+		UNINITIALISED,
 		SUCCESS,
 		RUNNING,
 		FAILURE
@@ -30,7 +31,7 @@ public:
 	virtual std::string getName() = 0;
 
 protected:
-	RoutineState state;
+	RoutineState state = UNINITIALISED;
 
 };
 

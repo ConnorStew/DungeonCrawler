@@ -9,21 +9,11 @@ void ConditionalRoutine::act(Entity * entity) {
     if (state == RUNNING) {
 		for (unsigned int i = 0; i < routines.size(); i++) {
 			Routine* routine = routines.at(i);
-            std::cout << "Proccessing " << routine->getName() << std::endl;
-            std::cout << "State: " << routine->getState() << std::endl;
+            //std::cout << "Proccessing " << routine->getName() << std::endl;
+            //std::cout << "State: " << routine->getState() << std::endl;
 			if (routine->getState() != SUCCESS && routine->getState() != FAILURE) {
-                std::cout << "Acting..." << std::endl;
-                if (entity == nullptr) {
-                    std::cout << "null entity" << std::endl;
-                }
-
-                if (routine == nullptr) {
-                    std::cout << "null routine" << std::endl;
-                }
-
 				allFinished = false;
 				routine->act(entity);
-                std::cout << "Acted" << std::endl;
                 if (routine->getState() == SUCCESS)
                     oneSucceeded = true;
                     

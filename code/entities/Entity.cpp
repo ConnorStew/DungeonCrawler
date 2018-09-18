@@ -48,10 +48,15 @@ void Entity::update() {
 	if (routine != nullptr)
 		routine->act(this);
 
-	shared_ptr<Tile> entityTile = graph->at(gridX,gridY);
-	setPosition(entityTile->getWorldX(), entityTile->getWorldY());
+	if (routine->getState() == Routine::SUCCESS || routine->getState() == Routine::FAILURE)
+		delete routine;
 }
 
 string Entity::getFriendlyName() {
 	return friendlyName;
+}
+
+Entity::~Entity() {
+	if (routine != nullptr)
+		delete routine;
 }
