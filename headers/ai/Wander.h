@@ -11,10 +11,11 @@ private:
 	std::uniform_int_distribution<std::mt19937::result_type> dist6;
 	const int MOVEMENT_AMOUNT = 1;
 
-	void validateMove(Entity &entity, int xIncrease, int yIncrease);
+	void validateMove(Entity * entity, int xIncrease, int yIncrease);
 public:
 	Wander();
-	void act(Entity &entity);
+	void act(Entity * entity);
+	std::string getName();
 };
 
 #endif

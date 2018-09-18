@@ -6,15 +6,17 @@
 
 using std::shared_ptr;
 
-void Wander::validateMove(Entity & entity, int xIncrease, int yIncrease) {
-	Graph<Tile> graph = entity.getGraph();
-	int targetX = entity.getGridX() + xIncrease;
-	int targetY = entity.getGridY() + yIncrease;
-	shared_ptr<Tile> targetTile = graph[targetX][targetY];
+void Wander::validateMove(Entity * entity, int xIncrease, int yIncrease) {
+	Graph<Tile>* graph = entity->getGraph();
+	int targetX = entity->getGridX() + xIncrease;
+	int targetY = entity->getGridY() + yIncrease;
+	shared_ptr<Tile> targetTile = graph->at(targetX, targetY);
 
 	if (targetTile != nullptr && !targetTile->getFilled()) {
-		entity.setGridX(targetX);
-		entity.setGridY(targetY);
+		entity->setGridX(targetX);
+		entity->setGridY(targetY);
+		shared_ptr<Tile> entityTile = graph->at(entity->getGridX(),entity->getGridY());
+		entity->setPosition(entityTile->getWorldX(), entityTile->getWorldY());
 	}
 }
 
@@ -28,7 +30,7 @@ Wander::Wander() {
 /// RNG stuff from : https://stackoverflow.com/questions/13445688/how-to-generate-a-random-number-in-c
 /// </summary>
 /// <param name="entity"></param>
-void Wander::act(Entity & entity) {
+void Wander::act(Entity * entity) {
 	if (state == RUNNING) {
 		int direction = dist6(rng);
 		switch (direction) {
@@ -46,4 +48,8 @@ void Wander::act(Entity & entity) {
 				break;
 		}
 	}
+}
+
+std::string Wander::getName() {
+    return "Wander";
 }

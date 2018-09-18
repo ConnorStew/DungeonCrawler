@@ -36,14 +36,8 @@ private:
 	/// <summary> Where to load/save the map. </summary>
 	string fileLocation;
 
-	/// <summary> The starting tile. </summary>
-	shared_ptr<Tile> start;
-
-	/// <summary> The ending tile. </summary>
-	shared_ptr<Tile> end;
-
 	/// <summary> The graph to add tiles to. </summary>
-	Graph<Tile> &graph;
+	Graph<Tile>* graph;
 
 public:
 	/// <summary>
@@ -52,7 +46,7 @@ public:
 	/// </summary>
 	/// <param name="fileLocation">The location to save/load the map from.</param>
 	/// <param name="graph">The graph object to pass the loaded tiles to.</param>
-	TileMap(string fileLocation, Graph<Tile> &graph);
+	TileMap(string fileLocation, Graph<Tile>* graph);
 
 	/// <summary> Saves the tile to the given fileLocation. </summary>
 	void save();
@@ -77,20 +71,6 @@ public:
 
 	/// <summary> Gets the height of a tile. </summary>
 	int getHeight();
-
-	/// <summary> The end tile. </summary>
-	shared_ptr<Tile>& getEnd();
-
-	/// <summary> The start tile. </summary>
-	shared_ptr<Tile>& getStart();
-
-	/// <summary> Sets the starting tile of this map. </summary>
-	/// <param name="start">The new starting tile.</param>
-	void setStart(shared_ptr<Tile> start);
-
-	/// <summary> Sets the ending tile of this map. </summary>
-	/// <param name="start">The new ending tile.</param>
-	void setEnd(shared_ptr<Tile> end);
 };
 
 #endif
