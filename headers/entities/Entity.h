@@ -20,10 +20,15 @@ protected:
 	bool pathing;
 	Routine* routine;
 	string friendlyName;
+	sf::RectangleShape boundingBox;
+	int bbXOffset;
+	int bbYOffset;
+
 public:
 	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>* graph);
 	int getGridX();
 	int getGridY();
+	sf::RectangleShape getBoundingBox();
 	void setGridX(int gridX);
 	void setGridY(int gridY);
 	void setRoutine(Routine* routine);

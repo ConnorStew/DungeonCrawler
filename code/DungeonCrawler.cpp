@@ -52,6 +52,7 @@ void update() {
 	bool controlDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl);
 	bool yDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y);
 	bool sDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
+	bool leftDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
 
 	if (controlDown && sDown)
 		gameMap.save();
@@ -68,6 +69,10 @@ void update() {
 			if (qDown && tile->getGlobalBounds().contains(mousePos)) {
 				tile->setFilled(false);
 				graph->addConnections(x, y, gameMap.usingDiagonalMovement());
+			}
+
+			if (leftDown) {
+				//cout << std::to_string(mousePos.x) << "," << std::to_string(mousePos.y) << endl;
 			}
 
 			if (yDown && tile->getGlobalBounds().contains(mousePos)) {
@@ -101,10 +106,10 @@ void render() {
 
 	for (auto const& tileEntry : graph->getNodes()) {
 		shared_ptr<Tile> tile = tileEntry.second;
-		tile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
+		//tile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 
-		if (tile->getFilled())
-			tile->setFillColor(sf::Color::White);
+		// if (tile->getFilled())
+		// 	tile->setFillColor(sf::Color::White);
 	}
 
 	if (DRAW_PATH) {
@@ -118,9 +123,13 @@ void render() {
 			tile->setFillColor(sf::Color::Magenta);
 	}
 
+	graph->findNode(player.getPosition());
+
 	for (auto const& tileEntry : graph->getNodes())
 		window.draw(*tileEntry.second);
 
+	
+	window.draw(player.getBoundingBox());
 	window.draw(player);
 	window.draw(skeleton);
 	window.display();
@@ -130,21 +139,21 @@ int main() {
 	updateClock.restart();
 	skeletonClock.restart();
 
-	player.setRoutine(new Sequence {
-		new MoveTo(21, 25),
-		new MoveTo(21, 24),
-		new Sequence {
-			new MoveTo(8, 28),
-			new MoveTo(16, 1),
-			new MoveTo(2, 22)
-		}
-		//new Wander()
-	});
+	// player.setRoutine(new Sequence {
+	// 	new MoveTo(21, 25),
+	// 	new MoveTo(21, 24),
+	// 	new Sequence {
+	// 		new MoveTo(8, 28),
+	// 		new MoveTo(16, 1),
+	// 		new MoveTo(2, 22)
+	// 	}
+	// 	//new Wander()
+	// });
 
-	skeleton.setRoutine(new Sequence{
-		new MoveTo(12,12),
-		new Wander()
-	});
+	// skeleton.setRoutine(new Sequence{
+	// 	new MoveTo(12,12),
+	// 	new Wander()
+	// });
 
 	while (window.isOpen()) {
 		window.clear();

@@ -16,10 +16,10 @@ class TileMap {
 private:
 
 	/// <summary> X spacing between tiles. </summary>
-	const int X_SPACING = 2;
+	const int X_SPACING = 3;
 
 	/// <summary> Y spacing between tiles. </summary>
-	const int Y_SPACING = 2;
+	const int Y_SPACING = 3;
 
 	/// <summary> Whether the tiles should allow diagonal movement. </summary>
 	const bool DIAGONAL_MOVEMENT = true;

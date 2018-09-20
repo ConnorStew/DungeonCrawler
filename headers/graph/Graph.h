@@ -9,6 +9,8 @@ using std::shared_ptr;
 using std::vector;
 using std::pair;
 using std::map;
+using std::cout;
+using std::endl;
 
 /// <summary> A graph data structure used to map the connectiosn between nodes. </summary> 
 template <class T>
@@ -144,6 +146,12 @@ private:
 	}
 
 public:
+
+	shared_ptr<T> findNode(sf::Vector2f position) {
+		//cout << std::to_string(position.x) << ", " << std::to_string(position.y) << endl;
+
+		return nullptr;
+	}
 
 	void addNode(int x, int y, shared_ptr<T> node) {
 		nodes.insert(std::make_pair(std::make_pair(x,y), node));

@@ -17,6 +17,14 @@ public:
 private:
 	void moveGrid(int xIncrease, int yIncrease);
 	void move(int xIncrease, int yIncrease);
+	void moveEntity(sf::Vector2f pos);
+	shared_ptr<Tile> colliding();
+	enum Direction {
+		TOP,
+		BOTTOM,
+		LEFT,
+		RIGHT
+	};
 	
 };
 

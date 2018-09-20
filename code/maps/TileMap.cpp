@@ -41,9 +41,11 @@ TileMap::TileMap(string fileLocation, Graph<Tile>* graph) {
 
 			shared_ptr<Tile> stile = std::make_shared<Tile>(tile);
 			graph->addNode(x,y,stile);
+			stile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 
 			if (map["tiles"][fullLocation]["filled"] == true) {
 				graph->at(x,y)->setFilled(true);
+				graph->at(x,y)->setFillColor(sf::Color::White);
 			}
 		}
 	}
