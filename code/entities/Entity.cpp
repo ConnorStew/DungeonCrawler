@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "Entity.h"
+#include "TileMap.h"
 
 using std::string;
 
-Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile> * graph) {
+Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map) {
 	this->spriteLocation = spriteLocation;
 	this->gridX = gridX;
 	this->gridY = gridY;
 	this->friendlyName = friendlyName;
-	this->graph = graph;
+	this->map = map;
 
 	//const float percentDifference = 0.80;
 	const float percentDifference = 1.0;
@@ -23,7 +24,7 @@ Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY,
 	setTexture(texture);
 	setScale(width / getLocalBounds().width, height / getLocalBounds().height);
 
-	shared_ptr<Tile> entityTile = graph->at(gridX, gridY);
+	shared_ptr<Tile> entityTile = map->at(gridX, gridY);
 	setPosition(entityTile->getWorldX(), entityTile->getWorldY());
 
 	boundingBox = sf::RectangleShape(sf::Vector2f(percentWidth,percentHeight));
@@ -51,8 +52,8 @@ void Entity::setRoutine(Routine* routine) {
 	this->routine = routine;
 }
 
-Graph<Tile>* Entity::getGraph() {
-	return graph;
+TileMap* Entity::getMap() {
+	return map;
 }
 
 void Entity::update() {

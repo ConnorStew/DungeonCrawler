@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "routine.h"
-#include "Graph.h"
+#include "TileMap.h"
 
 class Entity;
 

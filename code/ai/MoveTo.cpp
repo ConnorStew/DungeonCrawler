@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MoveTo.h"
-#include "Graph.h"
+#include "TileMap.h"
 #include "Tile.h"
 #include "Entity.h"
 
@@ -14,11 +14,11 @@ void MoveTo::act(Entity * entity) {
 	if (state == UNINITIALISED) {
 		state = RUNNING;
 
-		Graph<Tile>* graph = entity->getGraph();
+		TileMap* map = entity->getMap();
 		int entityX = entity->getGridX();
 		int entityY = entity->getGridY();
 
-		pathList = graph->aStar(entityX, entityY, destX, destY);
+		pathList = map->aStar(entityX, entityY, destX, destY);
 		std::cout << entity->getFriendlyName() << ": beginning pathing to " << destX << ", " << destY << std::endl;
 		if (pathList.empty()) {
 			std::cout << entity->getFriendlyName() << ":Cannot find path to " << destX << ", " << destY << std::endl;

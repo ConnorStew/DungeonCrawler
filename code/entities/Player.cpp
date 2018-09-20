@@ -7,7 +7,7 @@ using std::vector;
 
 
 
-Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>* graph) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, graph) {
+Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, map) {
 	pathing = false;
 }
 
@@ -17,12 +17,12 @@ void Player::moveEntity(sf::Vector2f pos) {
 }
 
 void Player::moveGrid(int xIncrease, int yIncrease) {
-	shared_ptr<Tile> tile = graph->at(gridX + xIncrease,gridY + yIncrease);
+	shared_ptr<Tile> tile = map->at(gridX + xIncrease,gridY + yIncrease);
 	if (tile != nullptr && !tile->getFilled()) {
 		gridX = gridX + xIncrease;
 		gridY = gridY + yIncrease;
 
-		shared_ptr<Tile> entityTile = graph->at(gridX, gridY);
+		shared_ptr<Tile> entityTile = map->at(gridX, gridY);
 		moveEntity(entityTile->getPosition());
 	}
 }
@@ -99,7 +99,7 @@ void Player::update() {
 }
 
 shared_ptr<Tile> Player::colliding() {
-	for (const auto& entry : graph->getNodes()) {
+	for (const auto& entry : map->getNodes()) {
 		shared_ptr<Tile> tile = entry.second;
 		if (tile->getFilled()) {
 			if (tile->getGlobalBounds().intersects(boundingBox.getGlobalBounds())) {
