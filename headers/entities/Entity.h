@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Tile.h"
 #include "Routine.h"
+#include "TileMap.h"
 
 using std::string;
 using std::vector;
@@ -16,20 +17,28 @@ protected:
 	int gridY;
 	string spriteLocation;
 	sf::Texture texture;
-	Graph<Tile>* graph;
+	TileMap* map;
 	bool pathing;
 	Routine* routine;
 	string friendlyName;
+	sf::RectangleShape boundingBox;
+	int bbXOffset;
+	int bbYOffset;
+	int width;
+	int height;
+
 public:
-	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, Graph<Tile>* graph);
+	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map);
 	int getGridX();
 	int getGridY();
+	sf::RectangleShape getBoundingBox();
+	sf::Vector2f getCenter();
 	void setGridX(int gridX);
 	void setGridY(int gridY);
 	void setRoutine(Routine* routine);
 	void update();
 
-	Graph<Tile>* getGraph();
+	TileMap* getMap();
 	string getFriendlyName();
 	~Entity();
 };

@@ -1,22 +1,25 @@
 #include "stdafx.h"
-#include "MoveTo.h"
+#include "FreeMoveTo.h"
 #include "TileMap.h"
 #include "Tile.h"
 #include "Entity.h"
 
-MoveTo::MoveTo(int destX, int destY) {
+FreeMoveTo::FreeMoveTo(int destX, int destY) {
 	//state = RUNNING;
 	this->destX = destX;
 	this->destY = destY;
 }
 
-void MoveTo::act(Entity * entity) {
+void FreeMoveTo::act(Entity * entity) {
 	if (state == UNINITIALISED) {
 		state = RUNNING;
 
 		TileMap* map = entity->getMap();
-		int entityX = entity->getGridX();
-		int entityY = entity->getGridY();
+
+        shared_ptr<Tile> tile = map->findNode(entity->getCenter());
+
+		int entityX = tile->getGridX();
+		int entityY = tile->getGridY();
 
 		pathList = map->aStar(entityX, entityY, destX, destY);
 		std::cout << entity->getFriendlyName() << ": beginning pathing to " << destX << ", " << destY << std::endl;
@@ -45,6 +48,6 @@ void MoveTo::act(Entity * entity) {
 
 }	
 
-std::string MoveTo::getName() {
-    return "MoveTo (" + std::to_string(destX) + ")" + "(" + std::to_string(destY) + ")";
+std::string FreeMoveTo::getName() {
+    return "FreeMoveTo (" + std::to_string(destX) + ")" + "(" + std::to_string(destY) + ")";
 }

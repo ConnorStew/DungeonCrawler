@@ -4,10 +4,15 @@
 
 #include "stdafx.h"
 #include "Tile.h"
-#include "Graph.h"
+#include "TileMap.h"
 
 using std::string;
 using std::shared_ptr;
+using std::vector;
+using std::pair;
+using std::map;
+using std::cout;
+using std::endl;
 
 /// <summary>
 /// A map containing tiles.
@@ -16,10 +21,10 @@ class TileMap {
 private:
 
 	/// <summary> X spacing between tiles. </summary>
-	const int X_SPACING = 2;
+	const int X_SPACING = 3;
 
 	/// <summary> Y spacing between tiles. </summary>
-	const int Y_SPACING = 2;
+	const int Y_SPACING = 3;
 
 	/// <summary> Whether the tiles should allow diagonal movement. </summary>
 	const bool DIAGONAL_MOVEMENT = true;
@@ -36,9 +41,23 @@ private:
 	/// <summary> Where to load/save the map. </summary>
 	string fileLocation;
 
-	/// <summary> The graph to add tiles to. </summary>
-	Graph<Tile>* graph;
+	/// <summary> A list of nodes still being considered for the path. </summary>
+	vector<shared_ptr<Tile>> openList;
 
+	/// <summary> A list of nodes not being considered for the path. </summary>
+	vector<shared_ptr<Tile>> closedList;
+
+	/// <summary> A list of nodes on the path. </summary>
+	vector<shared_ptr<Tile>> path;
+
+	/// <summary> The nodes stored in the graph. </summary>
+	map<pair<int, int>, shared_ptr<Tile>> nodes;
+
+	map<pair<int, int>, vector<shared_ptr<Tile>>> adjList;
+
+	void connectIfValid(int x, int y, int xIncrease, int yIncrease);
+	shared_ptr<Tile> getNode(int x, int y);
+	int roundUp(int numToRound, int multiple);
 public:
 	/// <summary>
 	///	Constructor for a tilemap, the tiles are loaded and put into the graph object provided.
@@ -46,7 +65,7 @@ public:
 	/// </summary>
 	/// <param name="fileLocation">The location to save/load the map from.</param>
 	/// <param name="graph">The graph object to pass the loaded tiles to.</param>
-	TileMap(string fileLocation, Graph<Tile>* graph);
+	TileMap(string fileLocation);
 
 	/// <summary> Saves the tile to the given fileLocation. </summary>
 	void save();
@@ -71,6 +90,24 @@ public:
 
 	/// <summary> Gets the height of a tile. </summary>
 	int getHeight();
+
+	void appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
+
+	shared_ptr<Tile> findNode(sf::Vector2f position);
+	void addNode(int x, int y, shared_ptr<Tile> node);
+	void clear();
+	void addConnections(int x, int y);
+	void clearConnections(int x, int y);
+	vector<shared_ptr<Tile>>& adj(int x, int y);
+	bool inOpenList(shared_ptr<Tile> node);
+	bool inClosedList(shared_ptr<Tile> node);
+	const vector<shared_ptr<Tile>>& getOpenList();
+	const vector<shared_ptr<Tile>>& getClosedList();
+	const vector<shared_ptr<Tile>>& getPathList();
+	bool inPathList(shared_ptr<Tile> node);
+	map<pair<int, int>, shared_ptr<Tile>> getNodes();
+	shared_ptr<Tile> at(int x, int y);
+	vector<shared_ptr<Tile>> aStar(int x1, int y1, int x2, int y2);
 };
 
 #endif

@@ -7,25 +7,19 @@
 #include "MoveTo.h"
 #include "Sequence.h"
 #include "Wander.h"
-#include "Graph.h"
 #include "Selector.h"
+#include "FreeMoveTo.h"
 
 using std::shared_ptr;
 using std::vector;
 
-/// <summary> Mutex for to allow for editing vectors during multithreading. </summary>
-//std::mutex mutex;
-
-/// <summary> Graph which stores tiles. </summary>
-Graph<Tile>* graph = new Graph<Tile>();
-
-/// <summary> The games map. </summary>
-TileMap gameMap("res/map.json", graph);
+/// <summary> The games gameMap-> </summary>
+TileMap* gameMap = new TileMap("res/map.json");
 
 /// <summary> The SFML window. </summary>
-sf::RenderWindow window(sf::VideoMode(gameMap.getWidth(), gameMap.getHeight()), "Dungeon Crawler");
+sf::RenderWindow window(sf::VideoMode(gameMap->getWidth(), gameMap->getHeight()), "Dungeon Crawler");
 
-/// <summary> Whether the graph is currently running the A* algoritm. </summary>
+/// <summary> Whether the gameMap is currently running the A* algorithm. </summary>
 bool started = false;
 
 /// <summary> The clock to count FPS. </summary>
@@ -40,8 +34,8 @@ const bool DRAW_PATH = true;
 
 shared_ptr<Tile> targetTile = nullptr;
 
-Player player("res/mage.png", "Player", 5, 5, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
-Entity skeleton("res/skeleton.png", "Skeleton", 28, 28, gameMap.getTileSize().x, gameMap.getTileSize().y, graph);
+Player player("res/mage.png", "Player", 5, 5, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap);
+Entity skeleton("res/skeleton.png", "Skeleton", 28, 28, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap);
 
 void update() {
 
@@ -52,22 +46,37 @@ void update() {
 	bool controlDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl);
 	bool yDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y);
 	bool sDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
+	bool pDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
+	bool lmbDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+
+	if (lmbDown) {
+		shared_ptr<Tile> playerTile = gameMap->findNode(player.getCenter());
+		shared_ptr<Tile> mouseTile = gameMap->findNode(mousePos);
+
+		if (playerTile != nullptr && mouseTile != nullptr)
+			player.setRoutine(new FreeMoveTo(mouseTile->getGridX(), mouseTile->getGridY()));
+			//gameMap->aStar(playerTile->getGridX(), playerTile->getGridY(), mouseTile->getGridX(), mouseTile->getGridY());
+	}
 
 	if (controlDown && sDown)
-		gameMap.save();
+		gameMap->save();
 
-	for (int x = 0; x < gameMap.getSize(); x++) {
-		for (int y = 0; y < gameMap.getSize(); y++) {
-			shared_ptr<Tile> tile = graph->at(x,y);
+	for (int x = 0; x < gameMap->getSize(); x++) {
+		for (int y = 0; y < gameMap->getSize(); y++) {
+			shared_ptr<Tile> tile = gameMap->at(x,y);
 
 			if (eDown && tile->getGlobalBounds().contains(mousePos)) {
 				tile->setFilled(true);
-				graph->clearConnections(x, y);
+				gameMap->clearConnections(x, y);
 			}
 
 			if (qDown && tile->getGlobalBounds().contains(mousePos)) {
 				tile->setFilled(false);
-				graph->addConnections(x, y, gameMap.usingDiagonalMovement());
+				gameMap->addConnections(x, y);
+			}
+
+			if (pDown) {
+				gameMap->findNode(player.getPosition());
 			}
 
 			if (yDown && tile->getGlobalBounds().contains(mousePos)) {
@@ -76,13 +85,13 @@ void update() {
 
 			if (spaceDown && tile->getGlobalBounds().contains(mousePos)) {
 				//draw connections
-				vector<shared_ptr<Tile>> &connections = graph->adj(x, y);
+				vector<shared_ptr<Tile>> &connections = gameMap->adj(x, y);
 				for (unsigned int i = 0; i < connections.size(); i++) {
 					shared_ptr<Tile> connectedTile = connections.at(i);
 					sf::Vertex line[] =
 					{
-						sf::Vertex(sf::Vector2f(tile->getWorldX() + gameMap.getTileSize().x / 2, tile->getWorldY() + gameMap.getTileSize().y / 2), sf::Color(0, 255, 221,255)),
-						sf::Vertex(sf::Vector2f(connectedTile->getWorldX() + gameMap.getTileSize().x / 2, connectedTile->getWorldY() + gameMap.getTileSize().y / 2),  sf::Color(0, 255, 221,255))
+						sf::Vertex(sf::Vector2f(tile->getWorldX() + gameMap->getTileSize().x / 2, tile->getWorldY() + gameMap->getTileSize().y / 2), sf::Color(0, 255, 221,255)),
+						sf::Vertex(sf::Vector2f(connectedTile->getWorldX() + gameMap->getTileSize().x / 2, connectedTile->getWorldY() + gameMap->getTileSize().y / 2),  sf::Color(0, 255, 221,255))
 					};
 
 					window.draw(line, 2, sf::Lines);
@@ -99,7 +108,7 @@ void render() {
 	//fpsClock.restart();
 	//std::cout << std::to_string(framerate) << std::endl;
 
-	for (auto const& tileEntry : graph->getNodes()) {
+	for (auto const& tileEntry : gameMap->getNodes()) {
 		shared_ptr<Tile> tile = tileEntry.second;
 		tile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 
@@ -107,20 +116,26 @@ void render() {
 			tile->setFillColor(sf::Color::White);
 	}
 
+	shared_ptr<Tile> onTile = gameMap->findNode(player.getCenter());
+	if (onTile != nullptr) {
+		onTile->setFillColor(sf::Color::Green);
+	}
+
 	if (DRAW_PATH) {
-		for (shared_ptr<Tile> tile : graph->getOpenList())
+		for (shared_ptr<Tile> tile : gameMap->getOpenList())
 			tile->setFillColor(sf::Color::Green);
 
-		for (shared_ptr<Tile> tile : graph->getClosedList())
+		for (shared_ptr<Tile> tile : gameMap->getClosedList())
 			tile->setFillColor(sf::Color::Red);
 
-		for (shared_ptr<Tile> tile : graph->getPathList())
+		for (shared_ptr<Tile> tile : gameMap->getPathList())
 			tile->setFillColor(sf::Color::Magenta);
 	}
 
-	for (auto const& tileEntry : graph->getNodes())
+	for (auto const& tileEntry : gameMap->getNodes())
 		window.draw(*tileEntry.second);
 
+	//window.draw(player.getBoundingBox());
 	window.draw(player);
 	window.draw(skeleton);
 	window.display();
@@ -130,21 +145,21 @@ int main() {
 	updateClock.restart();
 	skeletonClock.restart();
 
-	player.setRoutine(new Sequence {
-		new MoveTo(21, 25),
-		new MoveTo(21, 24),
-		new Sequence {
-			new MoveTo(8, 28),
-			new MoveTo(16, 1),
-			new MoveTo(2, 22)
-		}
-		//new Wander()
-	});
+	// player.setRoutine(new Sequence {
+	// 	new MoveTo(21, 25),
+	// 	new MoveTo(21, 24),
+	// 	new Sequence {
+	// 		new MoveTo(8, 28),
+	// 		new MoveTo(16, 1),
+	// 		new MoveTo(2, 22)
+	// 	}gameMap
+	// 	//new Wander()
+	// });
 
-	skeleton.setRoutine(new Sequence{
-		new MoveTo(12,12),
-		new Wander()
-	});
+	// skeleton.setRoutine(new Sequence{
+	// 	new MoveTo(12,12),
+	// 	new Wander()
+	// });
 
 	while (window.isOpen()) {
 		window.clear();
@@ -167,7 +182,7 @@ int main() {
 		render();
 	}
 
-	delete graph;
+	delete gameMap;
 	
 	return 0;
 }
