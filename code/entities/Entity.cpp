@@ -10,6 +10,8 @@ Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY,
 	this->gridY = gridY;
 	this->friendlyName = friendlyName;
 	this->map = map;
+	this->width = width;
+	this->height = height;
 
 	//const float percentDifference = 0.80;
 	const float percentDifference = 1.0;
@@ -60,7 +62,7 @@ void Entity::update() {
 	if (routine != nullptr) {
 		if (routine->getState() == Routine::SUCCESS || routine->getState() == Routine::FAILURE) {
 			delete routine;
-		} else {
+		} else if (routine->getState() == Routine::UNINITIALISED || routine->getState() == Routine::RUNNING) {
 			routine->act(this);
 		}		
 	}
@@ -72,6 +74,11 @@ string Entity::getFriendlyName() {
 
 sf::RectangleShape Entity::getBoundingBox() {
 	return boundingBox;
+}
+
+sf::Vector2f Entity::getCenter() {
+	sf::Vector2f position = getPosition();
+	return sf::Vector2f(position.x + width / 2, position.y + height / 2);
 }
 
 Entity::~Entity() {

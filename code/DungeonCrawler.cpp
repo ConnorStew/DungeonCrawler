@@ -8,6 +8,7 @@
 #include "Sequence.h"
 #include "Wander.h"
 #include "Selector.h"
+#include "FreeMoveTo.h"
 
 using std::shared_ptr;
 using std::vector;
@@ -18,7 +19,7 @@ TileMap* gameMap = new TileMap("res/map.json");
 /// <summary> The SFML window. </summary>
 sf::RenderWindow window(sf::VideoMode(gameMap->getWidth(), gameMap->getHeight()), "Dungeon Crawler");
 
-/// <summary> Whether the gameMap is currently running the A* algoritm. </summary>
+/// <summary> Whether the gameMap is currently running the A* algorithm. </summary>
 bool started = false;
 
 /// <summary> The clock to count FPS. </summary>
@@ -46,6 +47,16 @@ void update() {
 	bool yDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y);
 	bool sDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
 	bool pDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
+	bool lmbDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+
+	if (lmbDown) {
+		shared_ptr<Tile> playerTile = gameMap->findNode(player.getCenter());
+		shared_ptr<Tile> mouseTile = gameMap->findNode(mousePos);
+
+		if (playerTile != nullptr && mouseTile != nullptr)
+			player.setRoutine(new FreeMoveTo(mouseTile->getGridX(), mouseTile->getGridY()));
+			//gameMap->aStar(playerTile->getGridX(), playerTile->getGridY(), mouseTile->getGridX(), mouseTile->getGridY());
+	}
 
 	if (controlDown && sDown)
 		gameMap->save();
@@ -99,10 +110,15 @@ void render() {
 
 	for (auto const& tileEntry : gameMap->getNodes()) {
 		shared_ptr<Tile> tile = tileEntry.second;
-		//tile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
+		tile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 
-		// if (tile->getFilled())
-		// 	tile->setFillColor(sf::Color::White);
+		if (tile->getFilled())
+			tile->setFillColor(sf::Color::White);
+	}
+
+	shared_ptr<Tile> onTile = gameMap->findNode(player.getCenter());
+	if (onTile != nullptr) {
+		onTile->setFillColor(sf::Color::Green);
 	}
 
 	if (DRAW_PATH) {
@@ -119,8 +135,7 @@ void render() {
 	for (auto const& tileEntry : gameMap->getNodes())
 		window.draw(*tileEntry.second);
 
-	
-	window.draw(player.getBoundingBox());
+	//window.draw(player.getBoundingBox());
 	window.draw(player);
 	window.draw(skeleton);
 	window.display();

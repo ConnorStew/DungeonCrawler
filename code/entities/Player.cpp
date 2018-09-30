@@ -5,8 +5,6 @@
 using std::shared_ptr;
 using std::vector;
 
-
-
 Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, map) {
 	pathing = false;
 }
@@ -48,7 +46,7 @@ void Player::move(int xIncrease, int yIncrease) {
 			moveEntity(sf::Vector2f(collidedTile->getPosition().x + tileWidth, getPosition().y));
 		}
 
-		collidedTile->setFillColor(sf::Color::Blue);
+		//collidedTile->setFillColor(sf::Color::Blue);
 	}
 
 
@@ -64,14 +62,14 @@ void Player::move(int xIncrease, int yIncrease) {
 
 		//move along y axis
 		if (rectY < tileY) { //top collision
-			cout << "top collision!" << endl;
+			//cout << "top collision!" << endl;
 			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y - tileHeight));
 		} else if (rectY > tileY) { //bottom collision
-			cout << "bottom collision!" << endl;
+			//cout << "bottom collision!" << endl;
 			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y + tileHeight));
 		}
 		
-		collidedTileY->setFillColor(sf::Color::Magenta);
+		//collidedTileY->setFillColor(sf::Color::Magenta);
 	}
 }
 

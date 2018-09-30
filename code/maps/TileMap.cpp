@@ -2,6 +2,8 @@
 #include "TileMap.h"
 #include "Tile.h"
 #include "TileMap.h"
+#include <cmath>
+#include <limits>
 
 using json = nlohmann::json;
 using std::string;
@@ -150,15 +152,84 @@ shared_ptr<Tile> TileMap::getNode(int x, int y) {
 }
 
 shared_ptr<Tile> TileMap::findNode(sf::Vector2f position) {
-	for (const auto& entry : nodes) {
-		shared_ptr<Node> node = entry.second;
+	int spaceBetweenTilesX = TILE_SIZE.x + X_SPACING;
+	int spaceBetweenTilesY = TILE_SIZE.y + Y_SPACING;
+	
+	//get the closest tile
+	int roundedX = roundUp(position.x, spaceBetweenTilesX);
+	int roundedY = roundUp(position.y, spaceBetweenTilesY);
+
+	//convert world position to tile position
+	int tileX = roundedX / spaceBetweenTilesX;
+	int tileY = roundedY / spaceBetweenTilesY;
+
+	shared_ptr<Tile> centerTile = getNode(tileX, tileY);
+
+	if (centerTile == nullptr)
+		return nullptr;
+
+	//get tiles in a square around the tile
+	vector<shared_ptr<Tile>> toCheck;
+	int centerX = centerTile->getGridX();
+	int centerY = centerTile->getGridY();
+
+	appendNodeIfExists(toCheck, centerX + 1, centerY);
+	appendNodeIfExists(toCheck, centerX - 1, centerY);
+	appendNodeIfExists(toCheck, centerX, centerY + 1);
+	appendNodeIfExists(toCheck, centerX, centerY - 1);
+	appendNodeIfExists(toCheck, centerX + 1, centerY + 1);
+	appendNodeIfExists(toCheck, centerX - 1, centerY + 1);
+	appendNodeIfExists(toCheck, centerX + 1, centerY - 1);
+	appendNodeIfExists(toCheck, centerX - 1, centerY - 1);
+
+	// centerTile->setFillColor(sf::Color::Blue);
+
+	// for (shared_ptr<Tile> tile : toCheck) {
+	// 	tile->setFillColor(sf::Color::Magenta);
+	// }
+
+	//get highest distance between the centers of the tiles and the given postion
+	float lowestDistance = std::numeric_limits<float>::max();
+	shared_ptr<Tile> lowestTile = nullptr;
+	for (shared_ptr<Tile> tile : toCheck) {
+		float xDist = tile->getWorldX() - position.x;
+		float yDist = tile->getWorldY() - position.y;
+		float xSquared = pow(xDist, 2);
+		float ySquared = pow(yDist, 2);
+
+		float distance = sqrt(xSquared + ySquared);
+		if (distance < lowestDistance) {
+			lowestDistance = distance;
+			lowestTile = tile;
+		}
 	}
 
-	return nullptr;
+	return lowestTile;
 }
 
-void TileMap::addNode(int x, int y, shared_ptr<Tile> node) {
-	nodes.insert(std::make_pair(std::make_pair(x,y), node));
+void  TileMap::appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY) {
+	shared_ptr<Tile> tile = getNode(gridX, gridY);
+	if (tile != nullptr && !tile->getFilled()) {
+		appendTo.push_back(tile);
+	}
+}
+
+int TileMap::roundUp(int numToRound, int multiple) {
+    if (multiple == 0)
+        return numToRound;
+
+    int remainder = abs(numToRound) % multiple;
+    if (remainder == 0)
+        return numToRound;
+
+    if (numToRound < 0)
+        return -(abs(numToRound) - remainder);
+    else
+        return numToRound - multiple - remainder;
+}
+
+void TileMap::addNode(int x, int y, shared_ptr<Tile> tile) {
+	nodes.insert(std::make_pair(std::make_pair(x,y), tile));
 }
 
 void TileMap::clear() {
@@ -182,10 +253,10 @@ void TileMap::addConnections(int x, int y) {
 }
 
 void TileMap::clearConnections(int x, int y) {
-	shared_ptr<Tile> node = nullptr;
+	shared_ptr<Tile> tile = nullptr;
 	auto it = nodes.find(std::make_pair(x, y));
 	if (it != nodes.end())
-		node = it->second;
+		tile = it->second;
 
 	vector<shared_ptr<Tile>>& connectedTiles = adj(x,y);
 
@@ -194,7 +265,7 @@ void TileMap::clearConnections(int x, int y) {
 
 		//remove the original tile from the connected tiles connections
 		vector<shared_ptr<Tile>>& adjList = adj(connectedTile->getGridX(), connectedTile->getGridY());
-		auto it = std::find(adjList.begin(), adjList.end(), node);
+		auto it = std::find(adjList.begin(), adjList.end(), tile);
 		if (it != adjList.end()) {
 			adjList.erase(it);
 		}
@@ -207,12 +278,12 @@ vector<shared_ptr<Tile>>& TileMap::adj(int x, int y) {
 	return adjList[std::make_pair(x,y)];
 }
 
-bool TileMap::inOpenList(shared_ptr<Tile> node) {
-	return std::find(openList.begin(), openList.end(), node) != openList.end();
+bool TileMap::inOpenList(shared_ptr<Tile> tile) {
+	return std::find(openList.begin(), openList.end(), tile) != openList.end();
 }
 
-bool TileMap::inClosedList(shared_ptr<Tile> node) {
-	return std::find(closedList.begin(), closedList.end(), node) != closedList.end();
+bool TileMap::inClosedList(shared_ptr<Tile> tile) {
+	return std::find(closedList.begin(), closedList.end(), tile) != closedList.end();
 }
 
 const vector<shared_ptr<Tile>>& TileMap::getOpenList() {
@@ -227,8 +298,8 @@ const vector<shared_ptr<Tile>>& TileMap::getPathList() {
 	return path;
 }
 
-bool TileMap::inPathList(shared_ptr<Tile> node) {
-	return std::find(path.begin(), path.end(), node) != path.end();
+bool TileMap::inPathList(shared_ptr<Tile> tile) {
+	return std::find(path.begin(), path.end(), tile) != path.end();
 }
 
 map<pair<int, int>, shared_ptr<Tile>> TileMap::getNodes() {
@@ -268,27 +339,27 @@ vector<shared_ptr<Tile>> TileMap::aStar(int x1, int y1, int x2, int y2) {
 		vector<shared_ptr<Tile>> lowestVertices = vector<shared_ptr<Tile>>();
 		float lowestScore = std::numeric_limits<float>::max();
 
-		for (shared_ptr<Tile> node : openList)
-			if (node->getF() < lowestScore)
-				lowestScore = node->getF();
+		for (shared_ptr<Tile> tile : openList)
+			if (tile->getF() < lowestScore)
+				lowestScore = tile->getF();
 
-		for (shared_ptr<Tile> node : openList)
-			if (node->getF() == lowestScore)
-				lowestVertices.push_back(node);
+		for (shared_ptr<Tile> tile : openList)
+			if (tile->getF() == lowestScore)
+				lowestVertices.push_back(tile);
 
-		for (shared_ptr<Tile> node : lowestVertices) {
+		for (shared_ptr<Tile> tile : lowestVertices) {
 			//std::lock_guard<std::mutex> lock(mutex);
 
-			closedList.push_back(node);
-			openList.erase(std::remove(openList.begin(), openList.end(), node), openList.end());
+			closedList.push_back(tile);
+			openList.erase(std::remove(openList.begin(), openList.end(), tile), openList.end());
 
-			for (shared_ptr<Tile> neighbour : adjList[std::make_pair(node->getGridX(),node->getGridY())]) {
+			for (shared_ptr<Tile> neighbour : adjList[std::make_pair(tile->getGridX(),tile->getGridY())]) {
 				if (!inClosedList(neighbour)) {
 
 					//the tile distance away
-					float tentativeG = node->getG() + std::abs(node->getGridX() - neighbour->getGridX()) + std::abs(node->getGridY() - neighbour->getGridY());
+					float tentativeG = tile->getG() + std::abs(tile->getGridX() - neighbour->getGridX()) + std::abs(tile->getGridY() - neighbour->getGridY());
 
-					//hueristic distance the world distance away in pixels
+					//heuristic distance the world distance away in pixels
 					float tentativeH = std::abs(end->getWorldX() - neighbour->getWorldX()) + std::abs(end->getWorldY() - neighbour->getWorldY());
 
 					//total the distance metrics
@@ -297,12 +368,12 @@ vector<shared_ptr<Tile>> TileMap::aStar(int x1, int y1, int x2, int y2) {
 					//add to open list and update score if not in open list
 					if (!inOpenList(neighbour)) {
 						openList.insert(openList.begin(), neighbour);
-						neighbour->updateScore(node->getGridX(), node->getGridY(), tentativeScore, tentativeG, tentativeH);
+						neighbour->updateScore(tile->getGridX(), tile->getGridY(), tentativeScore, tentativeG, tentativeH);
 					}
 
 					//update the score of the neighbouring vertex
 					if (tentativeScore < neighbour->getF()) {
-						neighbour->updateScore(node->getGridX(), node->getGridY(), tentativeScore, tentativeG, tentativeH);
+						neighbour->updateScore(tile->getGridX(), tile->getGridY(), tentativeScore, tentativeG, tentativeH);
 					}
 				}
 			}

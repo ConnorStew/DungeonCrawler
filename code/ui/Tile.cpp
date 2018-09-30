@@ -11,7 +11,8 @@ bool operator==(const Tile& lhs, const Tile& rhs) {
 
 std::ostream& operator<<(std::ostream& os, const Tile& tile) {
 	Node node = (Node)tile;
-	os << "x: " << std::to_string(node.getGridX()) << ", " << "y: " << std::to_string(node.getGridY());
+	os << "grid x: " << std::to_string(node.getGridX()) << ", " << "grid y: " << std::to_string(node.getGridY())
+	<< " world x:" << std::to_string(node.getWorldX()) << ", " << "world y:" << std::to_string(node.getWorldY());
 	return os;
 }
 

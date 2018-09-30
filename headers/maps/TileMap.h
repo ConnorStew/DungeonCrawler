@@ -57,7 +57,7 @@ private:
 
 	void connectIfValid(int x, int y, int xIncrease, int yIncrease);
 	shared_ptr<Tile> getNode(int x, int y);
-
+	int roundUp(int numToRound, int multiple);
 public:
 	/// <summary>
 	///	Constructor for a tilemap, the tiles are loaded and put into the graph object provided.
@@ -90,6 +90,8 @@ public:
 
 	/// <summary> Gets the height of a tile. </summary>
 	int getHeight();
+
+	void appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
 
 	shared_ptr<Tile> findNode(sf::Vector2f position);
 	void addNode(int x, int y, shared_ptr<Tile> node);

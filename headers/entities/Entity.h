@@ -24,12 +24,15 @@ protected:
 	sf::RectangleShape boundingBox;
 	int bbXOffset;
 	int bbYOffset;
+	int width;
+	int height;
 
 public:
 	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map);
 	int getGridX();
 	int getGridY();
 	sf::RectangleShape getBoundingBox();
+	sf::Vector2f getCenter();
 	void setGridX(int gridX);
 	void setGridY(int gridY);
 	void setRoutine(Routine* routine);
