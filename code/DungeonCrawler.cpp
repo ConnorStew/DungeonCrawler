@@ -8,7 +8,6 @@
 #include "Sequence.h"
 #include "Wander.h"
 #include "Selector.h"
-#include "FreeMoveTo.h"
 
 using std::shared_ptr;
 using std::vector;
@@ -34,8 +33,8 @@ const bool DRAW_PATH = true;
 
 shared_ptr<Tile> targetTile = nullptr;
 
-Player player("res/mage.png", "Player", 5, 5, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap);
-Entity skeleton("res/skeleton.png", "Skeleton", 28, 28, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap);
+Player player("res/mage.png", "Player", 5, 5, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 10);
+Entity skeleton("res/skeleton.png", "Skeleton", 28, 28, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 10);
 
 void update() {
 
@@ -54,8 +53,7 @@ void update() {
 		shared_ptr<Tile> mouseTile = gameMap->findNode(mousePos);
 
 		if (playerTile != nullptr && mouseTile != nullptr)
-			player.setRoutine(new FreeMoveTo(mouseTile->getGridX(), mouseTile->getGridY()));
-			//gameMap->aStar(playerTile->getGridX(), playerTile->getGridY(), mouseTile->getGridX(), mouseTile->getGridY());
+			player.setRoutine(new MoveTo(mousePos));
 	}
 
 	if (controlDown && sDown)
@@ -127,13 +125,30 @@ void render() {
 
 		for (shared_ptr<Tile> tile : gameMap->getClosedList())
 			tile->setFillColor(sf::Color::Red);
-
-		for (shared_ptr<Tile> tile : gameMap->getPathList())
-			tile->setFillColor(sf::Color::Magenta);
 	}
 
 	for (auto const& tileEntry : gameMap->getNodes())
-		window.draw(*tileEntry.second);
+	window.draw(*tileEntry.second);
+
+	if (DRAW_PATH) {
+
+		sf::Vector2f lastPoint = sf::Vector2f(0,0);
+		for (sf::Vector2f pathPoint : gameMap->getPathList()) {
+			sf::CircleShape shape(5);
+			shape.setFillColor(sf::Color::Magenta);
+			shape.setPosition(sf::Vector2f(pathPoint.x - 5, pathPoint.y - 5));
+			window.draw(shape);
+
+			if (lastPoint.x != 0 && lastPoint.y != 0) {
+				sf::Vertex line[] = {
+					sf::Vertex(lastPoint),
+					sf::Vertex(pathPoint)
+				};
+				window.draw(line, 2, sf::Lines);
+			}
+			lastPoint = pathPoint;
+		}
+	}
 
 	//window.draw(player.getBoundingBox());
 	window.draw(player);
@@ -170,6 +185,9 @@ int main() {
 
 		if (updateClock.getElapsedTime().asMilliseconds() > 50) {
 			player.update();
+
+			//skeleton.setRoutine(new MoveTo(player.getPosition()));
+			
 			updateClock.restart();
 		}
 

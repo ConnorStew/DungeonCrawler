@@ -5,13 +5,8 @@
 using std::shared_ptr;
 using std::vector;
 
-Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, map) {
+Player::Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map, int moveSpeed) : Entity(spriteLocation, friendlyName, gridX, gridY, width, height, map, moveSpeed) {
 	pathing = false;
-}
-
-void Player::moveEntity(sf::Vector2f pos) {
-	setPosition(pos);
-	boundingBox.setPosition(pos.x + bbXOffset / 2, pos.y + bbYOffset / 2);
 }
 
 void Player::moveGrid(int xIncrease, int yIncrease) {
@@ -22,54 +17,6 @@ void Player::moveGrid(int xIncrease, int yIncrease) {
 
 		shared_ptr<Tile> entityTile = map->at(gridX, gridY);
 		moveEntity(entityTile->getPosition());
-	}
-}
-
-//https://gamedev.stackexchange.com/questions/69339/2d-aabbs-and-resolving-multiple-collisions
-void Player::move(int xIncrease, int yIncrease) {
-	//move along x axis
-	moveEntity(sf::Vector2f(getPosition().x + xIncrease, getPosition().y));
-	shared_ptr<Tile> collidedTile = colliding();
-
-	//if moving the x axis caused a collision
-	if (collidedTile != nullptr) {
-		float rectX = getBoundingBox().getPosition().x;
-		float tileX = collidedTile->getWorldX();
-		float tileWidth = collidedTile->getSize().x;
-
-		//move along x axis
-		if (rectX < tileX) { //right collision
-			cout << "right collision!" << endl;
-			moveEntity(sf::Vector2f(collidedTile->getPosition().x - tileWidth, getPosition().y));
-		} else if (rectX > tileX) { //left collision
-			cout << "left collision!" << endl;
-			moveEntity(sf::Vector2f(collidedTile->getPosition().x + tileWidth, getPosition().y));
-		}
-
-		//collidedTile->setFillColor(sf::Color::Blue);
-	}
-
-
-	//move along y axis
-	moveEntity(sf::Vector2f(getPosition().x, getPosition().y + yIncrease));
-	shared_ptr<Tile> collidedTileY = colliding();
-
-	//if moving the x axis caused a collision
-	if (collidedTileY != nullptr) {
-		float rectY = getBoundingBox().getPosition().y;
-		float tileY = collidedTileY->getWorldY();
-		float tileHeight = collidedTileY->getSize().y;
-
-		//move along y axis
-		if (rectY < tileY) { //top collision
-			//cout << "top collision!" << endl;
-			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y - tileHeight));
-		} else if (rectY > tileY) { //bottom collision
-			//cout << "bottom collision!" << endl;
-			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y + tileHeight));
-		}
-		
-		//collidedTileY->setFillColor(sf::Color::Magenta);
 	}
 }
 
@@ -94,17 +41,4 @@ void Player::update() {
 
 	if (dDown)
 		move(MOVE_AMOUNT, 0);
-}
-
-shared_ptr<Tile> Player::colliding() {
-	for (const auto& entry : map->getNodes()) {
-		shared_ptr<Tile> tile = entry.second;
-		if (tile->getFilled()) {
-			if (tile->getGlobalBounds().intersects(boundingBox.getGlobalBounds())) {
-				return tile;
-			}
-		}
-	}
-
-	return nullptr;
 }

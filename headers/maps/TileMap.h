@@ -48,7 +48,7 @@ private:
 	vector<shared_ptr<Tile>> closedList;
 
 	/// <summary> A list of nodes on the path. </summary>
-	vector<shared_ptr<Tile>> path;
+	vector<sf::Vector2f> path;
 
 	/// <summary> The nodes stored in the graph. </summary>
 	map<pair<int, int>, shared_ptr<Tile>> nodes;
@@ -103,11 +103,10 @@ public:
 	bool inClosedList(shared_ptr<Tile> node);
 	const vector<shared_ptr<Tile>>& getOpenList();
 	const vector<shared_ptr<Tile>>& getClosedList();
-	const vector<shared_ptr<Tile>>& getPathList();
-	bool inPathList(shared_ptr<Tile> node);
+	const vector<sf::Vector2f>& getPathList();
 	map<pair<int, int>, shared_ptr<Tile>> getNodes();
 	shared_ptr<Tile> at(int x, int y);
-	vector<shared_ptr<Tile>> aStar(int x1, int y1, int x2, int y2);
+	vector<sf::Vector2f> aStar(sf::Vector2f startPos, sf::Vector2f target);
 };
 
 #endif

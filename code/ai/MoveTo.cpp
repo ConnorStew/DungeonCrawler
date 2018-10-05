@@ -4,10 +4,11 @@
 #include "Tile.h"
 #include "Entity.h"
 
-MoveTo::MoveTo(int destX, int destY) {
-	//state = RUNNING;
-	this->destX = destX;
-	this->destY = destY;
+using std::endl;
+using std::cout;
+
+MoveTo::MoveTo(sf::Vector2f target) {
+	this->target = target;
 }
 
 void MoveTo::act(Entity * entity) {
@@ -15,36 +16,34 @@ void MoveTo::act(Entity * entity) {
 		state = RUNNING;
 
 		TileMap* map = entity->getMap();
-		int entityX = entity->getGridX();
-		int entityY = entity->getGridY();
-
-		pathList = map->aStar(entityX, entityY, destX, destY);
-		std::cout << entity->getFriendlyName() << ": beginning pathing to " << destX << ", " << destY << std::endl;
+		pathList = map->aStar(entity->getPosition(), target);
+		cout << entity->getFriendlyName() << ": beginning pathing to " << target.x << ", " << target.y << endl;
 		if (pathList.empty()) {
-			std::cout << entity->getFriendlyName() << ":Cannot find path to " << destX << ", " << destY << std::endl;
+			cout << entity->getFriendlyName() << ":Cannot find path to " << target.x << ", " << target.y << endl;
 			state = FAILURE;
 		}
 	}
 
 	if (state == RUNNING) {
-		shared_ptr<Tile> tile = pathList.back();
-		pathList.pop_back();
-
-		//std::cout << "\t" << tile->getGridX() << ", " << tile->getGridY() << std::endl;
-
-		entity->setGridX(tile->getGridX());
-		entity->setGridY(tile->getGridY());
-		entity->setPosition(tile->getWorldX(), tile->getWorldY());
-		if (tile->getGridX() == destX && tile->getGridY() == destY) {
-			std::cout << entity->getFriendlyName() << ": made it to " << destX << ", " << destY << std::endl;
+		if (pathList.empty()) {
+			cout << "Reached position!" << endl;
 			state = SUCCESS;
-		} else if (pathList.empty()) {
-			state = FAILURE;
+			return;
+		}
+
+		sf::Vector2f targetPos = pathList.back();
+		cout << entity->getFriendlyName() << ": moving towards " << targetPos.x << ", " << targetPos.y << endl;
+
+		entity->moveTowards(targetPos);
+
+		if (entity->getPosition() == targetPos) {
+			cout << entity->getFriendlyName() << ": reached" << targetPos.x << ", " << targetPos.y << endl;
+			pathList.pop_back();
 		}
 	}
 
 }	
 
 std::string MoveTo::getName() {
-    return "MoveTo (" + std::to_string(destX) + ")" + "(" + std::to_string(destY) + ")";
+    return "MoveTo (" + std::to_string(target.x) + ")" + "(" + std::to_string(target.y) + ")";
 }

@@ -8,12 +8,11 @@
 
 class MoveTo : public Routine {
 private:
-	vector<shared_ptr<Tile>> pathList;
-	int destX;
-	int destY;
+	vector<sf::Vector2f> pathList;
+	sf::Vector2f target;
 
 public:
-	MoveTo(int destX, int destY);
+	MoveTo(sf::Vector2f target);
 
 	void act(Entity * entity);
 	std::string getName();

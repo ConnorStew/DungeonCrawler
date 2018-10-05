@@ -294,12 +294,8 @@ const vector<shared_ptr<Tile>>& TileMap::getClosedList() {
 	return closedList;
 }
 
-const vector<shared_ptr<Tile>>& TileMap::getPathList() {
+const vector<sf::Vector2f>& TileMap::getPathList() {
 	return path;
-}
-
-bool TileMap::inPathList(shared_ptr<Tile> tile) {
-	return std::find(path.begin(), path.end(), tile) != path.end();
 }
 
 map<pair<int, int>, shared_ptr<Tile>> TileMap::getNodes() {
@@ -310,13 +306,13 @@ shared_ptr<Tile> TileMap::at(int x, int y) {
 	return getNode(x,y);
 }
 
-vector<shared_ptr<Tile>> TileMap::aStar(int x1, int y1, int x2, int y2) {
-	shared_ptr<Tile> start = getNode(x1, y1);
-	shared_ptr<Tile> end = getNode(x2, y2);
+vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) {
+	shared_ptr<Tile> start = findNode(startPos);
+	shared_ptr<Tile> end = findNode(target);
 
 	if (start == nullptr || end == nullptr) {
 		std::cout << "Error: Tiles given are not on graph..." << std::endl;
-		return vector<shared_ptr<Tile>>();
+		return vector<sf::Vector2f>();
 	}
 
 	clear();
@@ -325,12 +321,18 @@ vector<shared_ptr<Tile>> TileMap::aStar(int x1, int y1, int x2, int y2) {
 	while (!openList.empty()) {
 
 		if (inOpenList(end)) {
-			shared_ptr<Tile> &current = end;
+			shared_ptr<Tile> &currentTile = end;
 
-			while (current != start) {
-				path.push_back(current);
-				current = nodes[std::make_pair(current->getParentX(),current->getParentY())];
-			}
+			//path.push_back(sf::Vector2f(start->getPosition().x + TILE_SIZE.x / 2, start->getPosition().y + TILE_SIZE.y / 2));
+
+			while (currentTile != start) {
+				sf::Vector2f tilePos = currentTile->getPosition();
+				//path.push_back(sf::Vector2f(tilePos.x + TILE_SIZE.x / 2, tilePos.y + TILE_SIZE.y / 2));
+				path.push_back(tilePos);
+				currentTile = nodes[std::make_pair(currentTile->getParentX(),currentTile->getParentY())];
+			};
+
+			
 
 			return path;
 		}
