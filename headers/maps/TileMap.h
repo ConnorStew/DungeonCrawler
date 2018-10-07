@@ -21,10 +21,10 @@ class TileMap {
 private:
 
 	/// <summary> X spacing between tiles. </summary>
-	const int X_SPACING = 3;
+	const int X_SPACING = 0;
 
 	/// <summary> Y spacing between tiles. </summary>
-	const int Y_SPACING = 3;
+	const int Y_SPACING = 0;
 
 	/// <summary> Whether the tiles should allow diagonal movement. </summary>
 	const bool DIAGONAL_MOVEMENT = true;
@@ -91,8 +91,9 @@ public:
 	/// <summary> Gets the height of a tile. </summary>
 	int getHeight();
 
+	void appendNodeIfExistsAndNotFilled(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
 	void appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
-
+	vector<shared_ptr<Tile>> getSurroundingNodes(sf::Vector2f position);
 	shared_ptr<Tile> findNode(sf::Vector2f position);
 	void addNode(int x, int y, shared_ptr<Tile> node);
 	void clear();

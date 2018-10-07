@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Tile.h"
+#include "World.h"
 
 using std::shared_ptr;
 using std::vector;
@@ -22,23 +23,23 @@ void Player::moveGrid(int xIncrease, int yIncrease) {
 
 void Player::update() {
 	Entity::update();
-	const int MOVE_AMOUNT = 10;
 	bool wDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W);
 	bool aDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A);
 	bool sDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
 	bool dDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D);
 	bool controlDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl);
+	float delta = World::getDeltaTime();
 
 	//player controls
 	if (wDown)
-		move(0, -MOVE_AMOUNT);
+		move(0, -(moveSpeed * delta));
 
 	if (sDown && !controlDown)
-		move(0, MOVE_AMOUNT);
+		move(0, moveSpeed * delta);
 
 	if (aDown)
-		move(-MOVE_AMOUNT, 0);
+		move(-(moveSpeed * delta), 0);
 
 	if (dDown)
-		move(MOVE_AMOUNT, 0);
+		move(moveSpeed * delta, 0);
 }

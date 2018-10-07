@@ -29,7 +29,7 @@ void ConditionalRoutine::act(Entity * entity) {
 		}
 
 		if (successCondition()) {
-            std::cout << "Conditional routine succeded." << std::endl;
+            std::cout << "Conditional routine succeeded." << std::endl;
 			state = SUCCESS;
             cleanup();
 		}

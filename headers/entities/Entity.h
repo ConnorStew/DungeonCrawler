@@ -11,6 +11,8 @@ using std::string;
 using std::vector;
 using std::shared_ptr;
 
+class World;
+
 class Entity : public sf::Sprite {
 protected:
 	int gridX;
@@ -50,7 +52,6 @@ public:
 	~Entity();
 
 private:
-	
 
 	enum Direction {
 		TOP,

@@ -10,6 +10,8 @@ using std::string;
 using std::vector;
 using std::shared_ptr;
 
+class World;
+
 class Player : public Entity {
 public:
 	Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map, int moveSpeed);

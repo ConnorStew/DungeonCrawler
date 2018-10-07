@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Entity.h"
 #include "TileMap.h"
+#include "World.h"
 
 using std::string;
 
@@ -13,6 +14,7 @@ Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY,
 	this->map = map;
 	this->width = width;
 	this->height = height;
+	this->routine = nullptr;
 
 	//const float percentDifference = 0.80;
 	const float percentDifference = 1.0;
@@ -41,8 +43,17 @@ void Entity::moveEntity(sf::Vector2f pos) {
 }
 
 shared_ptr<Tile> Entity::colliding() {
-	for (const auto& entry : map->getNodes()) {
-		shared_ptr<Tile> tile = entry.second;
+	// for (const auto& entry : map->getNodes()) {
+	// 	shared_ptr<Tile> tile = entry.second;
+	// 	if (tile->getFilled()) {
+	// 		if (tile->getGlobalBounds().intersects(boundingBox.getGlobalBounds())) {
+	// 			return tile;
+	// 		}
+	// 	}
+	// }
+
+	vector<shared_ptr<Tile>> tiles = map->getSurroundingNodes(getCenter());
+	for (std::shared_ptr<Tile> tile : tiles) {
 		if (tile->getFilled()) {
 			if (tile->getGlobalBounds().intersects(boundingBox.getGlobalBounds())) {
 				return tile;
@@ -55,17 +66,18 @@ shared_ptr<Tile> Entity::colliding() {
 
 void Entity::moveTowards(sf::Vector2f targetPos) {
 	sf::Vector2f entityPos = getPosition();
+	float delta = World::getDeltaTime();
 	float xIncrease = 0;
 	float yIncrease = 0;
 	float xDiff = targetPos.x - entityPos.x;
 	float yDiff = targetPos.y - entityPos.y;
 
 	if (xDiff != 0) {
-		xIncrease = moveSpeed;
+		xIncrease = moveSpeed * delta;
 	}
 
 	if (yDiff != 0) {
-		yIncrease = moveSpeed;
+		yIncrease = moveSpeed * delta;
 	}
 
 	if (xDiff < 0) {
@@ -97,7 +109,7 @@ void Entity::moveTowards(sf::Vector2f targetPos) {
 
 //https://gamedev.stackexchange.com/questions/69339/2d-aabbs-and-resolving-multiple-collisions
 void Entity::move(float xIncrease, float yIncrease) {
-	cout << "moving with x/y :" << xIncrease << ", " << yIncrease << endl;
+	//cout << "moving with x/y :" << xIncrease << ", " << yIncrease << endl;
 
 
 	//move along x axis
@@ -112,10 +124,10 @@ void Entity::move(float xIncrease, float yIncrease) {
 
 		//move along x axis
 		if (rectX < tileX) { //right collision
-			cout << "right collision!" << endl;
+			//cout << "right collision!" << endl;
 			moveEntity(sf::Vector2f(collidedTile->getPosition().x - tileWidth, getPosition().y));
 		} else if (rectX > tileX) { //left collision
-			cout << "left collision!" << endl;
+			//cout << "left collision!" << endl;
 			moveEntity(sf::Vector2f(collidedTile->getPosition().x + tileWidth, getPosition().y));
 		}
 
@@ -135,10 +147,10 @@ void Entity::move(float xIncrease, float yIncrease) {
 
 		//move along y axis
 		if (rectY < tileY) { //top collision
-			cout << "top collision!" << endl;
+			//cout << "top collision!" << endl;
 			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y - tileHeight));
 		} else if (rectY > tileY) { //bottom collision
-			cout << "bottom collision!" << endl;
+			//cout << "bottom collision!" << endl;
 			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y + tileHeight));
 		}
 		
