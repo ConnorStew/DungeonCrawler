@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "Entity.h"
 #include "TileMap.h"
+#include "World.h"
 
 using std::string;
 
-Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map) {
+Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map, int moveSpeed) {
+	this->moveSpeed = moveSpeed;
 	this->spriteLocation = spriteLocation;
 	this->gridX = gridX;
 	this->gridY = gridY;
@@ -12,6 +14,7 @@ Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY,
 	this->map = map;
 	this->width = width;
 	this->height = height;
+	this->routine = nullptr;
 
 	//const float percentDifference = 0.80;
 	const float percentDifference = 1.0;
@@ -32,6 +35,131 @@ Entity::Entity(string spriteLocation, string friendlyName, int gridX, int gridY,
 	boundingBox = sf::RectangleShape(sf::Vector2f(percentWidth,percentHeight));
 	boundingBox.setPosition(getPosition().x + bbXOffset / 2, getPosition().y + bbYOffset / 2);
 	boundingBox.setFillColor(sf::Color::Red);
+}
+
+void Entity::moveEntity(sf::Vector2f pos) {
+	setPosition(pos);
+	boundingBox.setPosition(pos.x + bbXOffset / 2, pos.y + bbYOffset / 2);
+}
+
+shared_ptr<Tile> Entity::colliding() {
+	// for (const auto& entry : map->getNodes()) {
+	// 	shared_ptr<Tile> tile = entry.second;
+	// 	if (tile->getFilled()) {
+	// 		if (tile->getGlobalBounds().intersects(boundingBox.getGlobalBounds())) {
+	// 			return tile;
+	// 		}
+	// 	}
+	// }
+
+	vector<shared_ptr<Tile>> tiles = map->getSurroundingNodes(getCenter());
+	for (std::shared_ptr<Tile> tile : tiles) {
+		if (tile->getFilled()) {
+			if (tile->getGlobalBounds().intersects(boundingBox.getGlobalBounds())) {
+				return tile;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void Entity::moveTowards(sf::Vector2f targetPos) {
+	sf::Vector2f entityPos = getPosition();
+	float delta = World::getDeltaTime();
+	float xIncrease = 0;
+	float yIncrease = 0;
+	float xDiff = targetPos.x - entityPos.x;
+	float yDiff = targetPos.y - entityPos.y;
+
+	if (xDiff != 0) {
+		xIncrease = moveSpeed * delta;
+	}
+
+	if (yDiff != 0) {
+		yIncrease = moveSpeed * delta;
+	}
+
+	if (xDiff < 0) {
+		xIncrease = -xIncrease;
+	}
+
+	if (yDiff < 0) {
+		yIncrease = -yIncrease;
+	}
+
+	if (yDiff > 0 && yDiff < moveSpeed) {
+		yIncrease = yDiff;
+	}
+
+	if (yDiff < 0 && yDiff > -moveSpeed) {
+		yIncrease = yDiff;
+	}
+
+	if (xDiff > 0 && xDiff < moveSpeed) {
+		xIncrease = xDiff;
+	}
+
+	if (xDiff < 0 && xDiff > -moveSpeed) {
+		xIncrease = xDiff;
+	}
+
+	move(xIncrease, yIncrease);
+}
+
+//https://gamedev.stackexchange.com/questions/69339/2d-aabbs-and-resolving-multiple-collisions
+void Entity::move(float xIncrease, float yIncrease) {
+	//cout << "moving with x/y :" << xIncrease << ", " << yIncrease << endl;
+
+
+	//move along x axis
+	moveEntity(sf::Vector2f(getPosition().x + xIncrease, getPosition().y));
+	shared_ptr<Tile> collidedTile = colliding();
+
+	//if moving the x axis caused a collision
+	if (collidedTile != nullptr) {
+		float rectX = getBoundingBox().getPosition().x;
+		float tileX = collidedTile->getWorldX();
+		float tileWidth = collidedTile->getSize().x;
+
+		//move along x axis
+		if (rectX < tileX) { //right collision
+			//cout << "right collision!" << endl;
+			moveEntity(sf::Vector2f(collidedTile->getPosition().x - tileWidth, getPosition().y));
+		} else if (rectX > tileX) { //left collision
+			//cout << "left collision!" << endl;
+			moveEntity(sf::Vector2f(collidedTile->getPosition().x + tileWidth, getPosition().y));
+		}
+
+		//collidedTile->setFillColor(sf::Color::Blue);
+	}
+
+
+	//move along y axis
+	moveEntity(sf::Vector2f(getPosition().x, getPosition().y + yIncrease));
+	shared_ptr<Tile> collidedTileY = colliding();
+
+	//if moving the x axis caused a collision
+	if (collidedTileY != nullptr) {
+		float rectY = getBoundingBox().getPosition().y;
+		float tileY = collidedTileY->getWorldY();
+		float tileHeight = collidedTileY->getSize().y;
+
+		//move along y axis
+		if (rectY < tileY) { //top collision
+			//cout << "top collision!" << endl;
+			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y - tileHeight));
+		} else if (rectY > tileY) { //bottom collision
+			//cout << "bottom collision!" << endl;
+			moveEntity(sf::Vector2f(getPosition().x, collidedTileY->getPosition().y + tileHeight));
+		}
+		
+		//collidedTileY->setFillColor(sf::Color::Magenta);
+	}
+}
+
+int Entity::getMoveSpeed() {
+	return moveSpeed;
 }
 
 int Entity::getGridX() {

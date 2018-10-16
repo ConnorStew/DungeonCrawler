@@ -5,17 +5,19 @@
 #include "stdafx.h"
 #include "Routine.h"
 #include "Tile.h"
+#include "World.h"
 
 class MoveTo : public Routine {
 private:
-	vector<shared_ptr<Tile>> pathList;
-	int destX;
-	int destY;
+	vector<sf::Vector2f> pathList;
+	sf::Vector2f target;
+	Entity* targetEntity = nullptr;
+	World* world = nullptr;
 
 public:
-	MoveTo(int destX, int destY);
-
-	void act(Entity * entity);
+	MoveTo(sf::Vector2f target);
+	MoveTo(Entity* targetEntity);
+	void act(Entity *entity);
 	std::string getName();
 };
 

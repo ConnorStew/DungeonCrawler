@@ -11,6 +11,8 @@ using std::string;
 using std::vector;
 using std::shared_ptr;
 
+class World;
+
 class Entity : public sf::Sprite {
 protected:
 	int gridX;
@@ -26,9 +28,13 @@ protected:
 	int bbYOffset;
 	int width;
 	int height;
+	int moveSpeed;
+
+	void moveEntity(sf::Vector2f pos);
+	shared_ptr<Tile> colliding();
 
 public:
-	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map);
+	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map, int moveSpeed);
 	int getGridX();
 	int getGridY();
 	sf::RectangleShape getBoundingBox();
@@ -37,10 +43,22 @@ public:
 	void setGridY(int gridY);
 	void setRoutine(Routine* routine);
 	void update();
+	void move(float xIncrease, float yIncrease);
+	void moveTowards(sf::Vector2f targetPos);
 
 	TileMap* getMap();
 	string getFriendlyName();
+	int getMoveSpeed();
 	~Entity();
+
+private:
+
+	enum Direction {
+		TOP,
+		BOTTOM,
+		LEFT,
+		RIGHT
+	};
 };
 
 #endif

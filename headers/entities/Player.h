@@ -10,22 +10,14 @@ using std::string;
 using std::vector;
 using std::shared_ptr;
 
+class World;
+
 class Player : public Entity {
 public:
-	Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map);
+	Player(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map, int moveSpeed);
 	void update();
 private:
 	void moveGrid(int xIncrease, int yIncrease);
-	void move(int xIncrease, int yIncrease);
-	void moveEntity(sf::Vector2f pos);
-	shared_ptr<Tile> colliding();
-	enum Direction {
-		TOP,
-		BOTTOM,
-		LEFT,
-		RIGHT
-	};
-	
 };
 
 #endif

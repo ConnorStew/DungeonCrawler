@@ -14,7 +14,7 @@ private:
 	void validateMove(Entity * entity, int xIncrease, int yIncrease);
 public:
 	Wander();
-	void act(Entity * entity);
+	void act(Entity *entity);
 	std::string getName();
 };
 

@@ -151,6 +151,29 @@ shared_ptr<Tile> TileMap::getNode(int x, int y) {
 		return nullptr;
 }
 
+vector<shared_ptr<Tile>> TileMap::getSurroundingNodes(sf::Vector2f position) {
+	shared_ptr<Tile> centerTile = findNode(position);
+
+	if (centerTile == nullptr)
+		return vector<shared_ptr<Tile>>();
+
+	//get tiles in a square around the tile
+	vector<shared_ptr<Tile>> toCheck;
+	int centerX = centerTile->getGridX();
+	int centerY = centerTile->getGridY();
+
+	appendNodeIfExists(toCheck, centerX + 1, centerY);
+	appendNodeIfExists(toCheck, centerX - 1, centerY);
+	appendNodeIfExists(toCheck, centerX, centerY + 1);
+	appendNodeIfExists(toCheck, centerX, centerY - 1);
+	appendNodeIfExists(toCheck, centerX + 1, centerY + 1);
+	appendNodeIfExists(toCheck, centerX - 1, centerY + 1);
+	appendNodeIfExists(toCheck, centerX + 1, centerY - 1);
+	appendNodeIfExists(toCheck, centerX - 1, centerY - 1);
+
+	return toCheck;
+}
+
 shared_ptr<Tile> TileMap::findNode(sf::Vector2f position) {
 	int spaceBetweenTilesX = TILE_SIZE.x + X_SPACING;
 	int spaceBetweenTilesY = TILE_SIZE.y + Y_SPACING;
@@ -173,20 +196,14 @@ shared_ptr<Tile> TileMap::findNode(sf::Vector2f position) {
 	int centerX = centerTile->getGridX();
 	int centerY = centerTile->getGridY();
 
-	appendNodeIfExists(toCheck, centerX + 1, centerY);
-	appendNodeIfExists(toCheck, centerX - 1, centerY);
-	appendNodeIfExists(toCheck, centerX, centerY + 1);
-	appendNodeIfExists(toCheck, centerX, centerY - 1);
-	appendNodeIfExists(toCheck, centerX + 1, centerY + 1);
-	appendNodeIfExists(toCheck, centerX - 1, centerY + 1);
-	appendNodeIfExists(toCheck, centerX + 1, centerY - 1);
-	appendNodeIfExists(toCheck, centerX - 1, centerY - 1);
-
-	// centerTile->setFillColor(sf::Color::Blue);
-
-	// for (shared_ptr<Tile> tile : toCheck) {
-	// 	tile->setFillColor(sf::Color::Magenta);
-	// }
+	appendNodeIfExistsAndNotFilled(toCheck, centerX + 1, centerY);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX - 1, centerY);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX, centerY + 1);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX, centerY - 1);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX + 1, centerY + 1);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX - 1, centerY + 1);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX + 1, centerY - 1);
+	appendNodeIfExistsAndNotFilled(toCheck, centerX - 1, centerY - 1);
 
 	//get highest distance between the centers of the tiles and the given postion
 	float lowestDistance = std::numeric_limits<float>::max();
@@ -207,7 +224,14 @@ shared_ptr<Tile> TileMap::findNode(sf::Vector2f position) {
 	return lowestTile;
 }
 
-void  TileMap::appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY) {
+void TileMap::appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY) {
+	shared_ptr<Tile> tile = getNode(gridX, gridY);
+	if (tile != nullptr) {
+		appendTo.push_back(tile);
+	}
+}
+
+void TileMap::appendNodeIfExistsAndNotFilled(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY) {
 	shared_ptr<Tile> tile = getNode(gridX, gridY);
 	if (tile != nullptr && !tile->getFilled()) {
 		appendTo.push_back(tile);
@@ -294,12 +318,8 @@ const vector<shared_ptr<Tile>>& TileMap::getClosedList() {
 	return closedList;
 }
 
-const vector<shared_ptr<Tile>>& TileMap::getPathList() {
+const vector<sf::Vector2f>& TileMap::getPathList() {
 	return path;
-}
-
-bool TileMap::inPathList(shared_ptr<Tile> tile) {
-	return std::find(path.begin(), path.end(), tile) != path.end();
 }
 
 map<pair<int, int>, shared_ptr<Tile>> TileMap::getNodes() {
@@ -310,13 +330,13 @@ shared_ptr<Tile> TileMap::at(int x, int y) {
 	return getNode(x,y);
 }
 
-vector<shared_ptr<Tile>> TileMap::aStar(int x1, int y1, int x2, int y2) {
-	shared_ptr<Tile> start = getNode(x1, y1);
-	shared_ptr<Tile> end = getNode(x2, y2);
+vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) {
+	shared_ptr<Tile> start = findNode(startPos);
+	shared_ptr<Tile> end = findNode(target);
 
 	if (start == nullptr || end == nullptr) {
 		std::cout << "Error: Tiles given are not on graph..." << std::endl;
-		return vector<shared_ptr<Tile>>();
+		return vector<sf::Vector2f>();
 	}
 
 	clear();
@@ -325,12 +345,18 @@ vector<shared_ptr<Tile>> TileMap::aStar(int x1, int y1, int x2, int y2) {
 	while (!openList.empty()) {
 
 		if (inOpenList(end)) {
-			shared_ptr<Tile> &current = end;
+			shared_ptr<Tile> &currentTile = end;
 
-			while (current != start) {
-				path.push_back(current);
-				current = nodes[std::make_pair(current->getParentX(),current->getParentY())];
-			}
+			//path.push_back(sf::Vector2f(start->getPosition().x + TILE_SIZE.x / 2, start->getPosition().y + TILE_SIZE.y / 2));
+
+			while (currentTile != start) {
+				sf::Vector2f tilePos = currentTile->getPosition();
+				//path.push_back(sf::Vector2f(tilePos.x + TILE_SIZE.x / 2, tilePos.y + TILE_SIZE.y / 2));
+				path.push_back(tilePos);
+				currentTile = nodes[std::make_pair(currentTile->getParentX(),currentTile->getParentY())];
+			};
+
+			
 
 			return path;
 		}

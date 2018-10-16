@@ -21,10 +21,10 @@ class TileMap {
 private:
 
 	/// <summary> X spacing between tiles. </summary>
-	const int X_SPACING = 3;
+	const int X_SPACING = 0;
 
 	/// <summary> Y spacing between tiles. </summary>
-	const int Y_SPACING = 3;
+	const int Y_SPACING = 0;
 
 	/// <summary> Whether the tiles should allow diagonal movement. </summary>
 	const bool DIAGONAL_MOVEMENT = true;
@@ -48,7 +48,7 @@ private:
 	vector<shared_ptr<Tile>> closedList;
 
 	/// <summary> A list of nodes on the path. </summary>
-	vector<shared_ptr<Tile>> path;
+	vector<sf::Vector2f> path;
 
 	/// <summary> The nodes stored in the graph. </summary>
 	map<pair<int, int>, shared_ptr<Tile>> nodes;
@@ -91,8 +91,9 @@ public:
 	/// <summary> Gets the height of a tile. </summary>
 	int getHeight();
 
+	void appendNodeIfExistsAndNotFilled(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
 	void appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
-
+	vector<shared_ptr<Tile>> getSurroundingNodes(sf::Vector2f position);
 	shared_ptr<Tile> findNode(sf::Vector2f position);
 	void addNode(int x, int y, shared_ptr<Tile> node);
 	void clear();
@@ -103,11 +104,10 @@ public:
 	bool inClosedList(shared_ptr<Tile> node);
 	const vector<shared_ptr<Tile>>& getOpenList();
 	const vector<shared_ptr<Tile>>& getClosedList();
-	const vector<shared_ptr<Tile>>& getPathList();
-	bool inPathList(shared_ptr<Tile> node);
+	const vector<sf::Vector2f>& getPathList();
 	map<pair<int, int>, shared_ptr<Tile>> getNodes();
 	shared_ptr<Tile> at(int x, int y);
-	vector<shared_ptr<Tile>> aStar(int x1, int y1, int x2, int y2);
+	vector<sf::Vector2f> aStar(sf::Vector2f startPos, sf::Vector2f target);
 };
 
 #endif
