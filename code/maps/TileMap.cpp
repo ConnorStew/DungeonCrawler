@@ -4,6 +4,7 @@
 #include "TileMap.h"
 #include <cmath>
 #include <limits>
+#include <cstdlib>
 
 using json = nlohmann::json;
 using std::string;
@@ -81,8 +82,94 @@ TileMap::TileMap(string fileLocation) {
 	for (int x = 0; x < size; x++)
 		for (int y = 0; y < size; y++)
 			addConnections(x, y);
+}
 
+TileMap::TileMap(string fileLocation, int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance) {
+	this->fileLocation = fileLocation;
+	this->size = size;
 
+	//add tiles
+	for (int x = 0; x < size; x++) {
+		for (int y = 0; y < size; y++) {
+			float worldX = (x * TILE_SIZE.x) + (x * X_SPACING);
+			float worldY = (y * TILE_SIZE.y) + (y * Y_SPACING);
+
+			Tile tile(x, y, worldX, worldY, false, TILE_SIZE);
+			tile.setSize(TILE_SIZE);
+			tile.setPosition(worldX, worldY);
+
+			shared_ptr<Tile> stile = std::make_shared<Tile>(tile);
+
+			addNode(x,y,stile);
+			
+			stile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
+		}
+	}
+
+	//fill the border
+	for (int x = 0; x < size; x++)
+		for (int y = 0; y < size; y++)
+			if (y == 0 || y == size - 1 || x == 0 || x == size - 1)
+				at(x,y)->setFilled(true);
+
+	//generate rooms
+	const int MAX_LOOP_COUNT = 50;
+	int loopCount = 0;
+	int roomCount = 0;
+
+	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::mt19937 rng(seed);
+	std::uniform_int_distribution<int> dist(1, size);
+
+	while (roomCount < targetRoomCount + 1) {
+		loopCount++;
+		if (loopCount > MAX_LOOP_COUNT)
+			break;
+
+		int startX = dist(rng);
+		int startY = dist(rng);
+
+		cout << "x: " << startX << ", y:" << startY << endl; 
+
+        int distanceFromSide = std::abs((size - 1) - startX);
+        int distanceFromRoof = std::abs((size - 1) - startY);
+
+	    if (distanceFromSide < roomSize || startX < 1 || distanceFromRoof < roomSize || startY < 1)
+            continue;
+
+		bool spaceTaken = false;
+		for (int x = startX - 1; x < startX + roomSize + 2; x++) {
+			for (int y = startY - 1; y < startY + roomSize + 2; y++) {
+				shared_ptr<Tile> tile = at(x,y);
+				if (tile != nullptr && tile->getFilled()) {
+					spaceTaken = true;
+				}
+			}
+		}
+
+		if (spaceTaken)
+			continue;
+
+		for (int x = startX; x < startX + roomSize + 1; x++) {
+			at(x, startY)->setFilled(true);
+			at(x, startY + roomSize)->setFilled(true);
+		}
+
+		for (int y = startY; y < startY + roomSize; y++) {
+			at(startX, y)->setFilled(true);
+			at(startX + roomSize, y)->setFilled(true);
+		}
+
+		roomCount++;
+	}
+
+	cout << loopCount << endl;
+	cout << roomCount << endl;
+
+	//add connections
+	for (int x = 0; x < size; x++)
+		for (int y = 0; y < size; y++)
+			addConnections(x, y);			
 }
 
 void TileMap::save() {

@@ -6,14 +6,16 @@
 float World::delta = 0;
 
 World::World() {
-    gameMap = new TileMap("res/map.json");
+    //gameMap = new TileMap("res/map.json");
+	gameMap = new TileMap("res/proceduralMap.json", 32, 5, 5, 3, 2);
+
     window = new sf::RenderWindow(sf::VideoMode(gameMap->getWidth(), gameMap->getHeight()), "Dungeon Crawler");
     timer = new sf::Clock();
     player = new Player("res/mage.png", "Player", 5, 6, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 1);
     skeleton = new Entity("res/skeleton.png", "Skeleton", 28, 28, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 1);
     skeleton2 = new Entity("res/skeleton.png", "Skeleton", 6, 6, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 1);
-    // player.setRoutine(new Sequence {
 
+    // player.setRoutine(new Sequence {
 	// 	new MoveTo(21, 25),
 	// 	new MoveTo(21, 24),
 	// 	new Sequence {
@@ -29,8 +31,8 @@ World::World() {
 	// 	new Wander()
 	// });
 
-	skeleton->setRoutine(new MoveTo(player));
-    skeleton2->setRoutine(new MoveTo(skeleton));
+	// skeleton->setRoutine(new MoveTo(player));
+    // skeleton2->setRoutine(new MoveTo(skeleton));
 
 	while (window->isOpen()) {
 		window->clear();
@@ -55,7 +57,6 @@ World::World() {
 }
 
 World::~World() {
-    delete window;
     delete gameMap;
     delete timer;
     delete skeleton;
@@ -152,9 +153,21 @@ void World::render() {
 			tile->setFillColor(sf::Color::Red);
 	}
 
-	for (auto const& tileEntry : gameMap->getNodes())
-	window->draw(*tileEntry.second);
+	for (auto const& tileEntry : gameMap->getNodes()) {
+		shared_ptr<Tile> tile = tileEntry.second;
 
+		//draw the border
+		sf::RectangleShape border(gameMap->getTileSize());
+		border.setFillColor(tile->getFillColor());
+		border.setOutlineColor(sf::Color::Black);
+		border.setOutlineThickness(2);
+		border.setPosition(tile->getPosition());
+
+		window->draw(*tile);
+		window->draw(border);
+	}
+		
+	
 	if (DRAW_PATH) {
 
 		sf::Vector2f lastPoint = sf::Vector2f(0,0);

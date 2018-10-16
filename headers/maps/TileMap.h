@@ -67,6 +67,8 @@ public:
 	/// <param name="graph">The graph object to pass the loaded tiles to.</param>
 	TileMap(string fileLocation);
 
+	TileMap(string fileLocation, int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance);
+
 	/// <summary> Saves the tile to the given fileLocation. </summary>
 	void save();
 
