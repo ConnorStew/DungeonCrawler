@@ -9,7 +9,7 @@
 
 class World {
 private:
-    const bool DRAW_PATH = false;
+    const bool DRAW_PATH = true;
 
     static float delta;
     sf::RenderWindow* window;
@@ -19,7 +19,9 @@ private:
     Entity* skeleton2;
     Player* player;
 
+    /** @brief Renders the world. */
     void render();
+    /** @brief Updates the world. */
     void update();
 public:
     static float getDeltaTime();

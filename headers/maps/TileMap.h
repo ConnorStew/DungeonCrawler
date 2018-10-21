@@ -14,101 +14,270 @@ using std::map;
 using std::cout;
 using std::endl;
 
-/// <summary>
-/// A map containing tiles.
-/// </summary>
+/** @breif A map containing tiles. */
 class TileMap {
 private:
 
-	/// <summary> X spacing between tiles. </summary>
+	/** @breif X spacing between tiles. */
 	const int X_SPACING = 0;
 
-	/// <summary> Y spacing between tiles. </summary>
+	/** @breif Y spacing between tiles. */
 	const int Y_SPACING = 0;
 
-	/// <summary> Whether the tiles should allow diagonal movement. </summary>
+	/** @breif Whether the tiles should allow diagonal movement. */
 	const bool DIAGONAL_MOVEMENT = true;
 
-	/// <summary> The size of a tile. </summary>
+	/** @breif The size of a tile. */
 	const sf::Vector2f TILE_SIZE = sf::Vector2f(20, 20);
 
-	/// <summary> The default size of the tile. </summary>
+	/** @breif The default size of the tile. */
 	const int DEFAULT_SIZE = 32;
 
-	/// <summary> The size of the map. </summary>
+	/** @brief The size of the map in tiles.  */
 	int size;
 
-	/// <summary> Where to load/save the map. </summary>
+	/** @breif Where to load/save the map. */
 	string fileLocation;
 
-	/// <summary> A list of nodes still being considered for the path. </summary>
+	/** @breif A list of nodes still being considered for the path. */
 	vector<shared_ptr<Tile>> openList;
 
-	/// <summary> A list of nodes not being considered for the path. </summary>
+	/** @breif A list of nodes not being considered for the path. */
 	vector<shared_ptr<Tile>> closedList;
 
-	/// <summary> A list of nodes on the path. </summary>
+	/** @breif A list of nodes on the path. */
 	vector<sf::Vector2f> path;
 
-	/// <summary> The nodes stored in the graph. </summary>
+	/** @breif The nodes stored in the graph. */
 	map<pair<int, int>, shared_ptr<Tile>> nodes;
-
+	
+	/** @breif A list of adjacent nodes in the graph. */
 	map<pair<int, int>, vector<shared_ptr<Tile>>> adjList;
 
+	/**
+	 * @brief Connects a node relative to the grid x/y position based on the xIncrease and yIncrease
+	 * 
+	 * @param x the base node grid x
+	 * @param y the base node grid y
+	 * @param xIncrease the amount of x nodes away from the base
+	 * @param yIncrease the amount of y nodes away from the base 
+	 */
 	void connectIfValid(int x, int y, int xIncrease, int yIncrease);
+
+	/**
+	 * @brief Gets a node at a certain grid position.
+	 * 
+	 * @param x grid x
+	 * @param y grid y
+	 * @return shared_ptr<Tile> the node at the given position 
+	 */
 	shared_ptr<Tile> getNode(int x, int y);
+
+	/**
+	 * @brief Rounds a number up to a multiple.
+	 * 
+	 * @param numToRound the number to round
+	 * @param multiple the multiple to round to
+	 * @return int the rounded number
+	 */
 	int roundUp(int numToRound, int multiple);
+
 public:
-	/// <summary>
-	///	Constructor for a tilemap, the tiles are loaded and put into the graph object provided.
-	/// Reference constructor: https://stackoverflow.com/questions/6576109/initialising-reference-in-constructor-c
-	/// </summary>
-	/// <param name="fileLocation">The location to save/load the map from.</param>
-	/// <param name="graph">The graph object to pass the loaded tiles to.</param>
+
+	/**
+	 * @brief Construct a new Tile Map object from a file
+	 * @param fileLocation the location to save/load the map from
+	 */
 	TileMap(string fileLocation);
 
+	/**
+	 * @brief Construct a new Tile Map object with a randomly generated map.
+	 * 
+	 * @param fileLocation the location to save/load the map from
+	 * @param size the size of the map in tiles
+	 * @param roomSize the size of each room
+	 * @param targetRoomCount the amount of rooms to put in the map
+	 * @param corridorSize the size of the maps corridors
+	 * @param roomDistance the minimum distance between rooms
+	 */
 	TileMap(string fileLocation, int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance);
 
-	/// <summary> Saves the tile to the given fileLocation. </summary>
+	/**
+	 * @brief Construct an empty Tile Map object
+	 * 
+	 * @param fileLocation the location to save the map
+	 * @param size the size of the map in tiles
+	 */
+	TileMap(string fileLocation, int size);
+
+	/**
+	 * @brief Replaces the map with a randomly generated one.
+	 * 
+	 * @param size the size of the map in tiles
+	 * @param roomSize the size of each room
+	 * @param targetRoomCount the amount of rooms to put in the map
+	 * @param corridorSize the size of the maps corridors
+	 * @param roomDistance the minimum distance between rooms
+	 */
+	void generate(int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance);
+
+	/** @breif Saves the tile to the given fileLocation. */
 	void save();
 
-	/// <summary> Gets the size of the graph.</summary>
+	/** @breif Gets the size of the graph.*/
 	int getSize();
 
-	/// <summary> Gets the y spacing in pixels between tiles. </summary>
+	/** @breif Gets the y spacing in pixels between tiles. */
 	int getYSpacing();
 
-	/// <summary> Gets the x spacing in pixels between tiles. </summary>
+	/** @breif Gets the x spacing in pixels between tiles. */
 	int getXSpacing();
 
-	/// <summary> Gets the size of an individual tile. </summary>
+	/** @breif Gets the size of an individual tile. */
 	sf::Vector2f getTileSize();
 
-	/// <summary> Whether this map can be traversed with diagonal movement. </summary>
+	/** @breif Whether this map can be traversed with diagonal movement. */
 	bool usingDiagonalMovement();
 
-	/// <summary> Gets the width of a tile. </summary>
+	/** @breif Gets the width of a tile. */
 	int getWidth();
 
-	/// <summary> Gets the height of a tile. </summary>
+	/** @breif Gets the height of a tile. */
 	int getHeight();
 
+	/**
+	 * @brief Appends the node to a given list if it exists and isn't filled.
+	 * 
+	 * @param appendTo the list to append the node to
+	 * @param gridX the gridX of the node to append
+	 * @param gridY the gridY of the node to append
+	 */
 	void appendNodeIfExistsAndNotFilled(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
+
+	/**
+	 * @brief Append the node to the given list if it exists.
+	 * 
+	 * @param appendTo the list to append the node to
+	 * @param gridX the gridX of the node to append
+	 * @param gridY the gridY of the node to append
+	 */
 	void appendNodeIfExists(vector<shared_ptr<Tile>>& appendTo, int gridX, int gridY);
+
+	/**
+	 * @brief Gets a list of nodes surrounding the closet tile to a given postion.
+	 * 
+	 * @param position the position of the starting node
+	 * @return vector<shared_ptr<Tile>> the tiles surrounding the node that was found.
+	 */
 	vector<shared_ptr<Tile>> getSurroundingNodes(sf::Vector2f position);
+
+	/**
+	 * @brief Finds the closest node to a given world position.
+	 * 
+	 * @param position the position to search for
+	 * @return shared_ptr<Tile> the node that was the closest to the given position.
+	 */
 	shared_ptr<Tile> findNode(sf::Vector2f position);
+
+	/**
+	 * @brief Adds a node to the graph.
+	 * 
+	 * @param x the nodes grid x position
+	 * @param y the nodes grid y position
+	 * @param node the node to add to the graph.
+	 */
 	void addNode(int x, int y, shared_ptr<Tile> node);
+
+	/** @brief Clears the graphs pathfinding lists. */
 	void clear();
+
+	/**
+	 * @brief Connects nearby nodes to a node at the given grid position
+	 * 
+	 * @param x the grid x coordinate
+	 * @param y the grid y coordinate
+	 */
 	void addConnections(int x, int y);
+
+	/**
+	 * @brief Clears the connections to the node at the given position
+	 * 
+	 * @param x the grid x coordinate
+	 * @param y the grid y coordinate
+	 */
 	void clearConnections(int x, int y);
+
+	/**
+	 * @brief Gets a list of adjacent/connected nodes to the node at the given position.
+	 * 
+	 * @param x the grid x coordinate
+	 * @param y the grid y coordinate
+	 * @return vector<shared_ptr<Tile>>& A list of adjacent nodes
+	 */
 	vector<shared_ptr<Tile>>& adj(int x, int y);
+
+	/**
+	 * @brief Checks if a node is in the open list.
+	 * 
+	 * @param node the node to check
+	 * @return true it is in the open list
+	 * @return false it isn't in the open list
+	 */
 	bool inOpenList(shared_ptr<Tile> node);
+
+	/**
+	 * @brief Checks if a node is in the closed list.
+	 * 
+	 * @param node the node to check
+	 * @return true it is in the closed list
+	 * @return false it isn't in the closed list
+	 */
 	bool inClosedList(shared_ptr<Tile> node);
+
+	/**
+	 * @brief Get the Open List
+	 * 
+	 * @return const vector<shared_ptr<Tile>>& the open list
+	 */
 	const vector<shared_ptr<Tile>>& getOpenList();
+
+	/**
+	 * @brief Get the Closed List 
+	 * 
+	 * @return const vector<shared_ptr<Tile>>& the closed listS
+	 */
 	const vector<shared_ptr<Tile>>& getClosedList();
+
+	/**
+	 * @brief Get the Path List
+	 * 
+	 * @return const vector<sf::Vector2f>& the path list
+	 */
 	const vector<sf::Vector2f>& getPathList();
+
+	/**
+	 * @brief Get the Nodes in this map
+	 * 
+	 * @return map<pair<int, int>, shared_ptr<Tile>> the nodes in the map
+	 */
 	map<pair<int, int>, shared_ptr<Tile>> getNodes();
+
+	/**
+	 * @brief Gets the node at the given grid position.
+	 * 
+	 * @param x the grid x coordinate
+	 * @param y the grid y coordinate
+	 * @return shared_ptr<Tile> the node at the given postion.
+	 */
 	shared_ptr<Tile> at(int x, int y);
+
+	/**
+	 * @brief Runs the A* pathfinding algorithm to find the best path through the map.
+	 * 
+	 * @param startPos the starting position in world coordinates
+	 * @param target the target position in world cooridnates
+	 * @return vector<sf::Vector2f> the points in the path to get from the starting position to the target position
+	 */
 	vector<sf::Vector2f> aStar(sf::Vector2f startPos, sf::Vector2f target);
 };
 

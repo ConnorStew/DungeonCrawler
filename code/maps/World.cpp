@@ -2,13 +2,16 @@
 #include "MoveTo.h"
 #include "Player.h"
 #include "Entity.h"
+#include <thread>
+#include <mutex>
+#include "mingw.thread.h"
+#include "mingw.mutex.h"
+
 
 float World::delta = 0;
 
 World::World() {
-    //gameMap = new TileMap("res/map.json");
-	gameMap = new TileMap("res/proceduralMap.json", 32, 5, 5, 3, 2);
-
+	gameMap = new TileMap("res/proceduralMap.json");
     window = new sf::RenderWindow(sf::VideoMode(gameMap->getWidth(), gameMap->getHeight()), "Dungeon Crawler");
     timer = new sf::Clock();
     player = new Player("res/mage.png", "Player", 5, 6, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 1);
@@ -34,6 +37,8 @@ World::World() {
 	// skeleton->setRoutine(new MoveTo(player));
     // skeleton2->setRoutine(new MoveTo(skeleton));
 
+	std::thread first(&TileMap::generate, gameMap, 32, 5, 5, 3, 2);
+	first.detach();
 	while (window->isOpen()) {
 		window->clear();
 
@@ -47,9 +52,9 @@ World::World() {
 		timer->restart();
 		//cout << std::to_string(delta) << endl;
 
-		player->update();
-		skeleton->update();
-        skeleton2->update();
+		// player->update();
+		// skeleton->update();
+        // skeleton2->update();
 		
 		update();
 		render();
@@ -189,8 +194,8 @@ void World::render() {
 	}
 
 	//window->draw(player.getBoundingBox());
-	window->draw(*player);
-	window->draw(*skeleton);
-    window->draw(*skeleton2);
+	// window->draw(*player);
+	// window->draw(*skeleton);
+    // window->draw(*skeleton2);
 	window->display();
 }

@@ -5,6 +5,11 @@
 #include <cmath>
 #include <limits>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
+#include <mutex>
+#include "mingw.thread.h"
+#include "mingw.mutex.h"
 
 using json = nlohmann::json;
 using std::string;
@@ -14,6 +19,8 @@ using std::pair;
 using std::map;
 using std::cout;
 using std::endl;
+
+std::mutex mutexLock;
 
 TileMap::TileMap(string fileLocation) {
 	this->size = DEFAULT_SIZE;
@@ -86,7 +93,15 @@ TileMap::TileMap(string fileLocation) {
 
 TileMap::TileMap(string fileLocation, int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance) {
 	this->fileLocation = fileLocation;
+	generate(size, roomSize, targetRoomCount, corridorSize, roomDistance);
+}
+
+void TileMap::generate(int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance) {
+	std::lock_guard<std::mutex> lock(mutexLock);
+	cout << _WIN32_WINNT << endl;
 	this->size = size;
+
+	//nodes.clear();
 
 	//add tiles
 	for (int x = 0; x < size; x++) {
@@ -118,10 +133,17 @@ TileMap::TileMap(string fileLocation, int size, int roomSize, int targetRoomCoun
 	int roomCount = 0;
 
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+	//seed = 0;
 	std::mt19937 rng(seed);
 	std::uniform_int_distribution<int> dist(1, size);
 
+	int firstX = 0;
+	int firstY = 0;
+	bool firstSet = false;
+
 	while (roomCount < targetRoomCount + 1) {
+		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
 		loopCount++;
 		if (loopCount > MAX_LOOP_COUNT)
 			break;
@@ -160,16 +182,30 @@ TileMap::TileMap(string fileLocation, int size, int roomSize, int targetRoomCoun
 			at(startX + roomSize, y)->setFilled(true);
 		}
 
+		if (!firstSet) {
+			firstX = startX;
+			firstY = startY;
+			firstSet = true;
+		}
+
 		roomCount++;
 	}
 
+	cout << firstX << "," << firstY << endl;
+
+	//add connections between the rooms
+	shared_ptr<Tile> node = getNode(firstX, firstY);
+	shared_ptr<Tile> goal = getNode(10, 10);
+	aStar(node->getPosition(), goal->getPosition());
+
+	cout << "\nDone!" << endl;
 	cout << loopCount << endl;
 	cout << roomCount << endl;
 
 	//add connections
 	for (int x = 0; x < size; x++)
 		for (int y = 0; y < size; y++)
-			addConnections(x, y);			
+			addConnections(x, y);		
 }
 
 void TileMap::save() {
@@ -230,7 +266,9 @@ void TileMap::connectIfValid(int x, int y, int xIncrease, int yIncrease) {
 
 shared_ptr<Tile> TileMap::getNode(int x, int y) {
 	pair<int, int> myPair = std::make_pair(x,y);
-	typename std::map<pair<int, int>, shared_ptr<Tile>>::iterator it;
+	map<pair<int, int>, shared_ptr<Tile>>::iterator it;
+
+	//std::lock_guard<std::mutex> guard(mutex);
 	it = nodes.find(myPair);
 	if (it != nodes.end())
 		return it->second;
