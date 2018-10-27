@@ -9,23 +9,19 @@
 
 class World {
 private:
-    const bool DRAW_PATH = true;
-
     static float delta;
     sf::RenderWindow* window;
     TileMap* gameMap;
-    sf::Clock* timer;
     Entity* skeleton;
     Entity* skeleton2;
     Player* player;
+    vector<sf::Vertex> debugLines;
 
     /** @brief Renders the world. */
     void render();
     /** @brief Updates the world. */
     void update();
 public:
-    static float getDeltaTime();
-    
     World();
     ~World();
 };

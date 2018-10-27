@@ -7,9 +7,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <thread>
-#include <mutex>
 #include "mingw.thread.h"
-#include "mingw.mutex.h"
+#include "Room.h"
 
 using json = nlohmann::json;
 using std::string;
@@ -19,8 +18,6 @@ using std::pair;
 using std::map;
 using std::cout;
 using std::endl;
-
-std::mutex mutexLock;
 
 TileMap::TileMap(string fileLocation) {
 	this->size = DEFAULT_SIZE;
@@ -55,32 +52,15 @@ TileMap::TileMap(string fileLocation) {
 
 			shared_ptr<Tile> stile = std::make_shared<Tile>(tile);
 			addNode(x,y,stile);
-			stile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
+			//stile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 
 			if (map["tiles"][fullLocation]["filled"] == true) {
-				at(x,y)->setFilled(true);
-				at(x,y)->setFillColor(sf::Color::White);
+				at(x,y)->fill();
 			}
 		}
-	}
-	else {
+	} else {
 		std::cout << "Cannot load map at " << fileLocation << " generating default map." << std::endl;
-
-		//add empty tiles
-		for (int x = 0; x < size; x++) {
-			for (int y = 0; y < size; y++) {
-				float worldX = (x * TILE_SIZE.x) + (x * X_SPACING);
-				float worldY = (y * TILE_SIZE.y) + (y * Y_SPACING);
-
-				Tile tile(x, y, worldX, worldY, false, TILE_SIZE);
-				tile.setSize(TILE_SIZE);
-				tile.setPosition(worldX, worldY);
-
-				shared_ptr<Tile> stile = std::make_shared<Tile>(tile);
-				addNode(x,y,stile);
-				stile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
-			}
-		}
+		initMap();
 	}
 
 	in.close();
@@ -91,121 +71,162 @@ TileMap::TileMap(string fileLocation) {
 			addConnections(x, y);
 }
 
-TileMap::TileMap(string fileLocation, int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance) {
+TileMap::TileMap(string fileLocation, unsigned int targetRoomCount) {
 	this->fileLocation = fileLocation;
-	generate(size, roomSize, targetRoomCount, corridorSize, roomDistance);
+	this->size = size;
+	generate(targetRoomCount);
 }
 
-void TileMap::generate(int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance) {
-	std::lock_guard<std::mutex> lock(mutexLock);
-	cout << _WIN32_WINNT << endl;
+TileMap::TileMap(string fileLocation, int size) {
+	this->fileLocation = fileLocation;
 	this->size = size;
+	initMap();
+}
 
-	//nodes.clear();
+vector<int> TileMap::getTileInts() {
+	return tileInts;
+}
 
-	//add tiles
+void TileMap::initMap() {
+	//add empty tiles
 	for (int x = 0; x < size; x++) {
 		for (int y = 0; y < size; y++) {
 			float worldX = (x * TILE_SIZE.x) + (x * X_SPACING);
 			float worldY = (y * TILE_SIZE.y) + (y * Y_SPACING);
-
 			Tile tile(x, y, worldX, worldY, false, TILE_SIZE);
 			tile.setSize(TILE_SIZE);
 			tile.setPosition(worldX, worldY);
 
 			shared_ptr<Tile> stile = std::make_shared<Tile>(tile);
-
 			addNode(x,y,stile);
-			
 			stile->setFillColor(sf::Color(100, 100, 100, 255)); //default color
 		}
 	}
+}
+
+void TileMap::generate(unsigned int targetRoomCount) {
+	initMap();
 
 	//fill the border
 	for (int x = 0; x < size; x++)
 		for (int y = 0; y < size; y++)
 			if (y == 0 || y == size - 1 || x == 0 || x == size - 1)
-				at(x,y)->setFilled(true);
+				at(x,y)->fill();
 
 	//generate rooms
-	const int MAX_LOOP_COUNT = 50;
-	int loopCount = 0;
-	int roomCount = 0;
+	// const int MAX_LOOP_COUNT = 500;
+	// int loopCount = 0;
 
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
-	//seed = 0;
 	std::mt19937 rng(seed);
 	std::uniform_int_distribution<int> dist(1, size);
 
-	int firstX = 0;
-	int firstY = 0;
-	bool firstSet = false;
+	vector<Room> rooms;
 
-	while (roomCount < targetRoomCount + 1) {
-		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	// while (rooms.size() < targetRoomCount) {
+	// 	loopCount++;
+	// 	if (loopCount > MAX_LOOP_COUNT)
+	// 		break;
 
-		loopCount++;
-		if (loopCount > MAX_LOOP_COUNT)
-			break;
+	// 	int startX = dist(rng);
+	// 	int startY = dist(rng);
 
-		int startX = dist(rng);
-		int startY = dist(rng);
+	// 	Room room(startX, startY, roomSize, roomSize);
 
-		cout << "x: " << startX << ", y:" << startY << endl; 
+	// 	if (room.nearOtherRooms(roomDistance, rooms) || room.nearSide(2, size, size))
+	// 		continue;
 
-        int distanceFromSide = std::abs((size - 1) - startX);
-        int distanceFromRoof = std::abs((size - 1) - startY);
+	// 	rooms.push_back(room);
 
-	    if (distanceFromSide < roomSize || startX < 1 || distanceFromRoof < roomSize || startY < 1)
-            continue;
+	// 	for (int x = room.getX(); x < room.getX() + room.getWidth() + 1; x++) {
+	// 		if (x == room.getCenter().x)
+	// 			continue;
 
-		bool spaceTaken = false;
-		for (int x = startX - 1; x < startX + roomSize + 2; x++) {
-			for (int y = startY - 1; y < startY + roomSize + 2; y++) {
-				shared_ptr<Tile> tile = at(x,y);
-				if (tile != nullptr && tile->getFilled()) {
-					spaceTaken = true;
-				}
-			}
-		}
+	// 		at(x, room.getY())->fill();
+	// 		at(x, room.getY() + room.getHeight())->fill();
+	// 	}
 
-		if (spaceTaken)
-			continue;
+	// 	for (int y = room.getY(); y < room.getY() + room.getHeight(); y++) {
+	// 		if (y == room.getCenter().y)
+	// 			continue;
 
-		for (int x = startX; x < startX + roomSize + 1; x++) {
-			at(x, startY)->setFilled(true);
-			at(x, startY + roomSize)->setFilled(true);
-		}
+	// 		at(room.getX(), y)->fill();
+	// 		at(room.getX() + room.getWidth(), y)->fill();
+	// 	}
 
-		for (int y = startY; y < startY + roomSize; y++) {
-			at(startX, y)->setFilled(true);
-			at(startX + roomSize, y)->setFilled(true);
-		}
+	// 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	// }
 
-		if (!firstSet) {
-			firstX = startX;
-			firstY = startY;
-			firstSet = true;
-		}
+	// diagonalMovement = false;
 
-		roomCount++;
-	}
+	// //add connections
+	// for (int x = 0; x < size; x++)
+	// 	for (int y = 0; y < size; y++)
+	// 		addConnections(x, y);	
 
-	cout << firstX << "," << firstY << endl;
+	// vector<shared_ptr<Tile>> corridorList;
+	// //add connections between the rooms
+	// for (Room room1 : rooms) {
+	// 	for (Room room2: rooms) {
+	// 		shared_ptr<Tile> node = getNode(room1.getCenter().x, room1.getCenter().y);
+	// 		shared_ptr<Tile> goal =getNode(room2.getCenter().x, room2.getCenter().y);
+	// 		vector<shared_ptr<Tile>> list = aStarTiles(node, goal);
+	// 		corridorList.insert(corridorList.end(), list.begin(), list.end());
+	// 		for (shared_ptr<Tile> tile : list) {
+	// 			//tile->setFillColor(sf::Color::Yellow);
+	// 			tile->clear();
+	// 			//get surrounding tiles
+	// 			for (Connection connection : tile->getConnections()) {
+	// 				shared_ptr<Tile> connectedTile = connection.getConnectedTile();
 
-	//add connections between the rooms
-	shared_ptr<Tile> node = getNode(firstX, firstY);
-	shared_ptr<Tile> goal = getNode(10, 10);
-	aStar(node->getPosition(), goal->getPosition());
+	// 				bool insideRoom = false;
+	// 				for (Room room: rooms) {
+	// 					if (room.inside(connectedTile->getGridX(), connectedTile->getGridY())) {
+	// 						insideRoom = true;
+	// 						break;
+	// 					}
+	// 				}
 
-	cout << "\nDone!" << endl;
-	cout << loopCount << endl;
-	cout << roomCount << endl;
+	// 				//if its not in the path list
+	// 				if ((std::find(corridorList.begin(), corridorList.end(), connectedTile) == corridorList.end()) && !insideRoom) {
+	// 					connectedTile->fill();
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
-	//add connections
-	for (int x = 0; x < size; x++)
-		for (int y = 0; y < size; y++)
-			addConnections(x, y);		
+	// for (Room room : rooms) {
+	// 	shared_ptr<Tile> top = at(room.getCenter().x, room.getY());
+	// 	if (std::find(corridorList.begin(), corridorList.end(), top) == corridorList.end())
+	// 		top->fill();
+
+	// 	shared_ptr<Tile> bottom = at(room.getCenter().x, room.getY() + room.getHeight());
+	// 	if (std::find(corridorList.begin(), corridorList.end(), bottom) == corridorList.end())
+	// 		bottom->fill();
+
+	// 	shared_ptr<Tile> left = at(room.getX(), room.getCenter().y);
+	// 	if (std::find(corridorList.begin(), corridorList.end(), left) == corridorList.end())
+	// 		left->fill();
+
+	// 	shared_ptr<Tile> right = at(room.getX() + room.getWidth(), room.getCenter().y);
+	// 	if (std::find(corridorList.begin(), corridorList.end(), right) == corridorList.end())
+	// 		right->fill();
+	// }
+			
+	// cout << "\nDone!" << endl;
+	// cout << "Loop count: " << loopCount << endl;
+	// cout << "Room count: " << rooms.size() << endl;
+
+	// for (int x = 0; x < size; x++)
+	// 	for (int y = 0; y < size; y++)
+	// 		at(x,y)->getConnections().clear();
+
+	// //diagonalMovement = true;
+	// //add connections
+	// for (int x = 0; x < size; x++)
+	// 	for (int y = 0; y < size; y++)
+	// 		addConnections(x, y);	
 }
 
 void TileMap::save() {
@@ -244,7 +265,7 @@ sf::Vector2f TileMap::getTileSize() {
 }
 
 bool TileMap::usingDiagonalMovement() {
-	return DIAGONAL_MOVEMENT;
+	return diagonalMovement;
 }
 
 int TileMap::getWidth() {
@@ -258,8 +279,8 @@ int TileMap::getHeight() {
 void TileMap::connectIfValid(int x, int y, int xIncrease, int yIncrease) {
 	if (getNode(x,y) != nullptr && getNode(x + xIncrease, y + yIncrease) != nullptr) {
 		if (!getNode(x,y)->getFilled() && !getNode(x + xIncrease,y + yIncrease)->getFilled()) {
-			adj(x, y).push_back(getNode(x + xIncrease,y + yIncrease));
-			adj(x + xIncrease, y + yIncrease).push_back(getNode(x,y));
+			at(x,y)->addConnection(Connection(at(x + xIncrease,y + yIncrease), 0));
+			at(x + xIncrease,y + yIncrease)->addConnection(Connection(at(x, y), 0));
 		}
 	}
 }
@@ -381,19 +402,13 @@ void TileMap::addNode(int x, int y, shared_ptr<Tile> tile) {
 	nodes.insert(std::make_pair(std::make_pair(x,y), tile));
 }
 
-void TileMap::clear() {
-	openList.clear();
-	closedList.clear();
-	path.clear();
-}
-
 void TileMap::addConnections(int x, int y) {
 	connectIfValid(x, y, 1, 0); //right
 	connectIfValid(x, y, -1, 0); //left
 	connectIfValid(x, y, 0, 1); //up
 	connectIfValid(x, y, 0, -1); //down
 
-	if (DIAGONAL_MOVEMENT) {
+	if (diagonalMovement) {
 			connectIfValid(x, y, 1, -1); //bottom right
 			connectIfValid(x, y, 1, 1); //top right
 			connectIfValid(x, y, -1, -1); //bottom left
@@ -401,50 +416,31 @@ void TileMap::addConnections(int x, int y) {
 	}
 }
 
+
 void TileMap::clearConnections(int x, int y) {
 	shared_ptr<Tile> tile = nullptr;
 	auto it = nodes.find(std::make_pair(x, y));
 	if (it != nodes.end())
 		tile = it->second;
 
-	vector<shared_ptr<Tile>>& connectedTiles = adj(x,y);
+	vector<Connection> connections = adj(x,y);
 
-	for (unsigned int i = 0; i < connectedTiles.size(); i++) {
-		shared_ptr<Tile>& connectedTile = connectedTiles.at(i);
+	for (Connection connection : connections) {
+		shared_ptr<Tile> connectedTile = connection.getConnectedTile();
 
 		//remove the original tile from the connected tiles connections
-		vector<shared_ptr<Tile>>& adjList = adj(connectedTile->getGridX(), connectedTile->getGridY());
-		auto it = std::find(adjList.begin(), adjList.end(), tile);
-		if (it != adjList.end()) {
-			adjList.erase(it);
-		}
+		vector<Connection> otherConnections = connectedTile->getConnections();
+		otherConnections.erase(std::remove_if(otherConnections.begin(), otherConnections.end(), 
+		[tile](Connection & o) { 
+			return o.getConnectedTile() == tile;
+		}), otherConnections.end());
 	}
 
-	connectedTiles.clear();
+	connections.clear();
 }
 
-vector<shared_ptr<Tile>>& TileMap::adj(int x, int y) {
-	return adjList[std::make_pair(x,y)];
-}
-
-bool TileMap::inOpenList(shared_ptr<Tile> tile) {
-	return std::find(openList.begin(), openList.end(), tile) != openList.end();
-}
-
-bool TileMap::inClosedList(shared_ptr<Tile> tile) {
-	return std::find(closedList.begin(), closedList.end(), tile) != closedList.end();
-}
-
-const vector<shared_ptr<Tile>>& TileMap::getOpenList() {
-	return openList;
-}
-
-const vector<shared_ptr<Tile>>& TileMap::getClosedList() {
-	return closedList;
-}
-
-const vector<sf::Vector2f>& TileMap::getPathList() {
-	return path;
+const vector<Connection>& TileMap::adj(int x, int y) {
+	return at(x,y)->getConnections();
 }
 
 map<pair<int, int>, shared_ptr<Tile>> TileMap::getNodes() {
@@ -456,6 +452,15 @@ shared_ptr<Tile> TileMap::at(int x, int y) {
 }
 
 vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) {
+	/** @breif A list of nodes on the path. */
+	vector<sf::Vector2f> path;
+
+	/** @breif A list of nodes still being considered for the path. */
+	vector<shared_ptr<Tile>> openList;
+
+	/** @breif A list of nodes not being considered for the path. */
+	vector<shared_ptr<Tile>> closedList;
+
 	shared_ptr<Tile> start = findNode(startPos);
 	shared_ptr<Tile> end = findNode(target);
 
@@ -464,12 +469,11 @@ vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) 
 		return vector<sf::Vector2f>();
 	}
 
-	clear();
 	openList.push_back(start);
 
 	while (!openList.empty()) {
 
-		if (inOpenList(end)) {
+		if (std::find(openList.begin(), openList.end(), end) != openList.end()) {
 			shared_ptr<Tile> &currentTile = end;
 
 			//path.push_back(sf::Vector2f(start->getPosition().x + TILE_SIZE.x / 2, start->getPosition().y + TILE_SIZE.y / 2));
@@ -504,8 +508,9 @@ vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) 
 			closedList.push_back(tile);
 			openList.erase(std::remove(openList.begin(), openList.end(), tile), openList.end());
 
-			for (shared_ptr<Tile> neighbour : adjList[std::make_pair(tile->getGridX(),tile->getGridY())]) {
-				if (!inClosedList(neighbour)) {
+			for (Connection neighbourConnection : tile->getConnections()) {
+				shared_ptr<Tile> neighbour = neighbourConnection.getConnectedTile();
+				if (std::find(closedList.begin(), closedList.end(), neighbour) == closedList.end()) {
 
 					//the tile distance away
 					float tentativeG = tile->getG() + std::abs(tile->getGridX() - neighbour->getGridX()) + std::abs(tile->getGridY() - neighbour->getGridY());
@@ -517,7 +522,7 @@ vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) 
 					float tentativeScore = (tentativeG + tentativeH);
 
 					//add to open list and update score if not in open list
-					if (!inOpenList(neighbour)) {
+					if (std::find(openList.begin(), openList.end(), neighbour) == openList.end()) {
 						openList.insert(openList.begin(), neighbour);
 						neighbour->updateScore(tile->getGridX(), tile->getGridY(), tentativeScore, tentativeG, tentativeH);
 					}
@@ -532,4 +537,89 @@ vector<sf::Vector2f> TileMap::aStar(sf::Vector2f startPos, sf::Vector2f target) 
 	}
 
 	return path;
+}
+
+vector<shared_ptr<Tile>> TileMap::aStarTiles(shared_ptr<Tile> start, shared_ptr<Tile> end) {
+
+	/** @breif A list of nodes on the path. */
+	vector<shared_ptr<Tile>> tilePath;
+
+	/** @breif A list of nodes still being considered for the path. */
+	vector<shared_ptr<Tile>> openList;
+
+	/** @breif A list of nodes not being considered for the path. */
+	vector<shared_ptr<Tile>> closedList;
+
+	if (start == nullptr || end == nullptr) {
+		std::cout << "Error: Tiles given are not on graph..." << std::endl;
+		return vector<shared_ptr<Tile>>();
+	}
+
+	openList.push_back(start);
+	//start->setFillColor(sf::Color::Green);
+
+	while (!openList.empty()) {
+
+		if (std::find(openList.begin(), openList.end(), end) != openList.end()) {
+			shared_ptr<Tile> currentTile = end;
+
+			while (currentTile != start) {
+				tilePath.push_back(currentTile);
+				//start->setFillColor(sf::Color::Yellow);
+				currentTile = nodes[std::make_pair(currentTile->getParentX(),currentTile->getParentY())];
+			};
+
+			return tilePath;
+		}
+
+		//get lowest nodes
+		vector<shared_ptr<Tile>> lowestVertices = vector<shared_ptr<Tile>>();
+		float lowestScore = std::numeric_limits<float>::max();
+
+		for (shared_ptr<Tile> tile : openList)
+			if (tile->getF() < lowestScore)
+				lowestScore = tile->getF();
+
+		for (shared_ptr<Tile> tile : openList)
+			if (tile->getF() == lowestScore)
+				lowestVertices.push_back(tile);
+
+		for (shared_ptr<Tile> tile : lowestVertices) {
+			//std::lock_guard<std::mutex> lock(mutex);
+
+			closedList.push_back(tile);
+			//tile->setFillColor(sf::Color::Red);
+			openList.erase(std::remove(openList.begin(), openList.end(), tile), openList.end());
+
+			for (Connection neighbourConnection : tile->getConnections()) {
+				shared_ptr<Tile> neighbour = neighbourConnection.getConnectedTile();
+				//if not found in the closed list
+				if (std::find(closedList.begin(), closedList.end(), neighbour) == closedList.end()) {
+
+					//the tile distance away
+					float tentativeG = tile->getG() + std::abs(tile->getGridX() - neighbour->getGridX()) + std::abs(tile->getGridY() - neighbour->getGridY());
+
+					//heuristic distance the world distance away in pixels
+					float tentativeH = std::abs(end->getWorldX() - neighbour->getWorldX()) + std::abs(end->getWorldY() - neighbour->getWorldY());
+
+					//total the distance metrics
+					float tentativeScore = (tentativeG + tentativeH);
+
+					//add to open list and update score if not in open list
+					if (std::find(openList.begin(), openList.end(), neighbour) == openList.end()) {
+						openList.insert(openList.begin(), neighbour);
+						//neighbour->setFillColor(sf::Color::Green);
+						neighbour->updateScore(tile->getGridX(), tile->getGridY(), tentativeScore, tentativeG, tentativeH);
+					}
+
+					//update the score of the neighbouring vertex
+					if (tentativeScore < neighbour->getF()) {
+						neighbour->updateScore(tile->getGridX(), tile->getGridY(), tentativeScore, tentativeG, tentativeH);
+					}
+				}
+			}
+		}
+	}
+
+	return tilePath;
 }

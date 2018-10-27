@@ -18,6 +18,10 @@ using std::endl;
 class TileMap {
 private:
 
+	vector<int> tileInts;
+	const int width = 128;
+	const int height = 128;
+
 	/** @breif X spacing between tiles. */
 	const int X_SPACING = 0;
 
@@ -25,7 +29,7 @@ private:
 	const int Y_SPACING = 0;
 
 	/** @breif Whether the tiles should allow diagonal movement. */
-	const bool DIAGONAL_MOVEMENT = true;
+	bool diagonalMovement = true;
 
 	/** @breif The size of a tile. */
 	const sf::Vector2f TILE_SIZE = sf::Vector2f(20, 20);
@@ -39,20 +43,8 @@ private:
 	/** @breif Where to load/save the map. */
 	string fileLocation;
 
-	/** @breif A list of nodes still being considered for the path. */
-	vector<shared_ptr<Tile>> openList;
-
-	/** @breif A list of nodes not being considered for the path. */
-	vector<shared_ptr<Tile>> closedList;
-
-	/** @breif A list of nodes on the path. */
-	vector<sf::Vector2f> path;
-
 	/** @breif The nodes stored in the graph. */
 	map<pair<int, int>, shared_ptr<Tile>> nodes;
-	
-	/** @breif A list of adjacent nodes in the graph. */
-	map<pair<int, int>, vector<shared_ptr<Tile>>> adjList;
 
 	/**
 	 * @brief Connects a node relative to the grid x/y position based on the xIncrease and yIncrease
@@ -82,7 +74,10 @@ private:
 	 */
 	int roundUp(int numToRound, int multiple);
 
+	/** @brief Fills the map with empty tiles. */
+	void initMap();
 public:
+	vector<int> getTileInts();
 
 	/**
 	 * @brief Construct a new Tile Map object from a file
@@ -94,13 +89,9 @@ public:
 	 * @brief Construct a new Tile Map object with a randomly generated map.
 	 * 
 	 * @param fileLocation the location to save/load the map from
-	 * @param size the size of the map in tiles
-	 * @param roomSize the size of each room
 	 * @param targetRoomCount the amount of rooms to put in the map
-	 * @param corridorSize the size of the maps corridors
-	 * @param roomDistance the minimum distance between rooms
 	 */
-	TileMap(string fileLocation, int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance);
+	TileMap(string fileLocation, unsigned int targetRoomCount);
 
 	/**
 	 * @brief Construct an empty Tile Map object
@@ -113,13 +104,9 @@ public:
 	/**
 	 * @brief Replaces the map with a randomly generated one.
 	 * 
-	 * @param size the size of the map in tiles
-	 * @param roomSize the size of each room
 	 * @param targetRoomCount the amount of rooms to put in the map
-	 * @param corridorSize the size of the maps corridors
-	 * @param roomDistance the minimum distance between rooms
 	 */
-	void generate(int size, int roomSize, int targetRoomCount, int corridorSize, int roomDistance);
+	void generate(unsigned int targetRoomCount);
 
 	/** @breif Saves the tile to the given fileLocation. */
 	void save();
@@ -188,9 +175,6 @@ public:
 	 */
 	void addNode(int x, int y, shared_ptr<Tile> node);
 
-	/** @brief Clears the graphs pathfinding lists. */
-	void clear();
-
 	/**
 	 * @brief Connects nearby nodes to a node at the given grid position
 	 * 
@@ -214,46 +198,7 @@ public:
 	 * @param y the grid y coordinate
 	 * @return vector<shared_ptr<Tile>>& A list of adjacent nodes
 	 */
-	vector<shared_ptr<Tile>>& adj(int x, int y);
-
-	/**
-	 * @brief Checks if a node is in the open list.
-	 * 
-	 * @param node the node to check
-	 * @return true it is in the open list
-	 * @return false it isn't in the open list
-	 */
-	bool inOpenList(shared_ptr<Tile> node);
-
-	/**
-	 * @brief Checks if a node is in the closed list.
-	 * 
-	 * @param node the node to check
-	 * @return true it is in the closed list
-	 * @return false it isn't in the closed list
-	 */
-	bool inClosedList(shared_ptr<Tile> node);
-
-	/**
-	 * @brief Get the Open List
-	 * 
-	 * @return const vector<shared_ptr<Tile>>& the open list
-	 */
-	const vector<shared_ptr<Tile>>& getOpenList();
-
-	/**
-	 * @brief Get the Closed List 
-	 * 
-	 * @return const vector<shared_ptr<Tile>>& the closed listS
-	 */
-	const vector<shared_ptr<Tile>>& getClosedList();
-
-	/**
-	 * @brief Get the Path List
-	 * 
-	 * @return const vector<sf::Vector2f>& the path list
-	 */
-	const vector<sf::Vector2f>& getPathList();
+	const vector<Connection>& adj(int x, int y);
 
 	/**
 	 * @brief Get the Nodes in this map
@@ -279,6 +224,15 @@ public:
 	 * @return vector<sf::Vector2f> the points in the path to get from the starting position to the target position
 	 */
 	vector<sf::Vector2f> aStar(sf::Vector2f startPos, sf::Vector2f target);
+
+	/**
+	 * @brief Runs the A* pathfinding algorithm to find the best path through the map.
+	 * 
+	 * @param start the starting tile
+	 * @param target the target tile
+	 * @return shared_ptr<Tile> tiles to get from the start to the end
+	 */
+	vector<shared_ptr<Tile>> aStarTiles(shared_ptr<Tile> start, shared_ptr<Tile> target);
 };
 
 #endif

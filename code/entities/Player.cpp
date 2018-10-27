@@ -28,18 +28,17 @@ void Player::update() {
 	bool sDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
 	bool dDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D);
 	bool controlDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl);
-	float delta = World::getDeltaTime();
 
 	//player controls
 	if (wDown)
-		move(0, -(moveSpeed * delta));
+		move(0, -(moveSpeed));
 
 	if (sDown && !controlDown)
-		move(0, moveSpeed * delta);
+		move(0, moveSpeed);
 
 	if (aDown)
-		move(-(moveSpeed * delta), 0);
+		move(-(moveSpeed), 0);
 
 	if (dDown)
-		move(moveSpeed * delta, 0);
+		move(moveSpeed, 0);
 }

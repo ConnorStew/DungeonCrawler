@@ -66,18 +66,17 @@ shared_ptr<Tile> Entity::colliding() {
 
 void Entity::moveTowards(sf::Vector2f targetPos) {
 	sf::Vector2f entityPos = getPosition();
-	float delta = World::getDeltaTime();
 	float xIncrease = 0;
 	float yIncrease = 0;
 	float xDiff = targetPos.x - entityPos.x;
 	float yDiff = targetPos.y - entityPos.y;
 
 	if (xDiff != 0) {
-		xIncrease = moveSpeed * delta;
+		xIncrease = moveSpeed;
 	}
 
 	if (yDiff != 0) {
-		yIncrease = moveSpeed * delta;
+		yIncrease = moveSpeed;
 	}
 
 	if (xDiff < 0) {

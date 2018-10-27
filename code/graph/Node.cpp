@@ -12,6 +12,14 @@ Node::Node(int gridX, int gridY, float worldX, float worldY, bool filled) {
 	this->f = std::numeric_limits<float>::max();
 }
 
+void Node::addConnection(Connection connection) {
+	connections.push_back(connection);
+}
+
+vector<Connection>& Node::getConnections() {
+	return connections;
+}
+
 float Node::getG() {
 	return g;
 }

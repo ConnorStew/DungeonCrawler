@@ -3,6 +3,7 @@
 #define NODE_H
 
 #include "stdafx.h"
+#include "Connection.h"
 
 using std::shared_ptr;
 using std::pair;
@@ -29,8 +30,9 @@ class Node {
 
 		float worldY;
 
-	public:
+		vector<Connection> connections;
 
+	public:
 		Node(int gridX, int gridY, float worldX, float worldY, bool filled);
 
 		float getG();
@@ -46,13 +48,13 @@ class Node {
 
 		void updateScore(int parentX, int parentY, float f, float g, float h);
 		void setParent(int parentX, int parentY);
-
-		void setFilled(bool set);
-
+		void addConnection(Connection connection);
+		vector<Connection>& getConnections();
 	protected:
 		int gridX;
 		int gridY;
-	
+
+		void setFilled(bool set);
 };
 
 #endif
