@@ -32,7 +32,7 @@ private:
 	bool diagonalMovement = true;
 
 	/** @breif The size of a tile. */
-	const sf::Vector2f TILE_SIZE = sf::Vector2f(20, 20);
+	const sf::Vector2f TILE_SIZE = sf::Vector2f(5, 5);
 
 	/** @breif The default size of the tile. */
 	const int DEFAULT_SIZE = 32;
@@ -86,14 +86,6 @@ public:
 	TileMap(string fileLocation);
 
 	/**
-	 * @brief Construct a new Tile Map object with a randomly generated map.
-	 * 
-	 * @param fileLocation the location to save/load the map from
-	 * @param targetRoomCount the amount of rooms to put in the map
-	 */
-	TileMap(string fileLocation, unsigned int targetRoomCount);
-
-	/**
 	 * @brief Construct an empty Tile Map object
 	 * 
 	 * @param fileLocation the location to save the map
@@ -126,10 +118,10 @@ public:
 	/** @breif Whether this map can be traversed with diagonal movement. */
 	bool usingDiagonalMovement();
 
-	/** @breif Gets the width of a tile. */
+	/** @breif Gets the width of the map. */
 	int getWidth();
 
-	/** @breif Gets the height of a tile. */
+	/** @breif Gets the height of the map. */
 	int getHeight();
 
 	/**

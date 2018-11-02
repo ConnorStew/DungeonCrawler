@@ -14,7 +14,7 @@ Tile::Tile(int gridX, int gridY, float worldX, float worldY, bool filled, sf::Ve
 	border = sf::RectangleShape(tileSize);
 	border.setFillColor(sf::Color::Transparent);
 	border.setOutlineColor(sf::Color::Black);
-	border.setOutlineThickness(2);
+	border.setOutlineThickness(0.5);
 	border.setPosition(sf::Vector2f(worldX, worldY));
 }
 

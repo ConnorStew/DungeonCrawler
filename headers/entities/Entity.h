@@ -31,7 +31,7 @@ protected:
 	int moveSpeed;
 
 	void moveEntity(sf::Vector2f pos);
-	shared_ptr<Tile> colliding();
+	shared_ptr<Tile> colliding(sf::Vector2f increase);
 
 public:
 	Entity(string spriteLocation, string friendlyName, int gridX, int gridY, int width, int height, TileMap* map, int moveSpeed);

@@ -57,3 +57,19 @@ int Room::getWidth() {
 int Room::getHeight() {
     return height;
 }
+
+sf::Vector2f Room::getTop() {
+    return sf::Vector2f(gridX + width / 2, gridY);
+}
+
+sf::Vector2f Room::getBottom() {
+    return sf::Vector2f(gridX + width / 2, gridY + height);
+}
+
+sf::Vector2f Room::getLeft() {
+    return sf::Vector2f(gridX, gridY + height / 2);
+}
+
+sf::Vector2f Room::getRight() {
+    return sf::Vector2f(gridX + width, gridY + height / 2);
+}

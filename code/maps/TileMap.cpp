@@ -71,12 +71,6 @@ TileMap::TileMap(string fileLocation) {
 			addConnections(x, y);
 }
 
-TileMap::TileMap(string fileLocation, unsigned int targetRoomCount) {
-	this->fileLocation = fileLocation;
-	this->size = size;
-	generate(targetRoomCount);
-}
-
 TileMap::TileMap(string fileLocation, int size) {
 	this->fileLocation = fileLocation;
 	this->size = size;
@@ -105,128 +99,138 @@ void TileMap::initMap() {
 }
 
 void TileMap::generate(unsigned int targetRoomCount) {
-	initMap();
-
 	//fill the border
 	for (int x = 0; x < size; x++)
 		for (int y = 0; y < size; y++)
 			if (y == 0 || y == size - 1 || x == 0 || x == size - 1)
 				at(x,y)->fill();
 
-	//generate rooms
-	// const int MAX_LOOP_COUNT = 500;
-	// int loopCount = 0;
+	cout << "Room count: " << targetRoomCount << endl;
+	
+	int loopCount = 0;
 
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::mt19937 rng(seed);
 	std::uniform_int_distribution<int> dist(1, size);
-
+	std::uniform_int_distribution<int> distDirection(0, 3);
+	std::uniform_int_distribution<int> distSize(4, 16);
 	vector<Room> rooms;
 
-	// while (rooms.size() < targetRoomCount) {
-	// 	loopCount++;
-	// 	if (loopCount > MAX_LOOP_COUNT)
-	// 		break;
+	Room lastRoom = Room(4, 4, 5, 10);
+	cout << lastRoom.getX() << ", " << lastRoom.getY() << endl;
+	rooms.push_back(lastRoom);
 
-	// 	int startX = dist(rng);
-	// 	int startY = dist(rng);
+		for (int x = lastRoom.getX(); x < lastRoom.getX() + lastRoom.getWidth() + 1; x++) {
+			at(x, lastRoom.getY())->fill();
+			at(x, lastRoom.getY() + lastRoom.getHeight())->fill();
+		}
 
-	// 	Room room(startX, startY, roomSize, roomSize);
+		for (int y = lastRoom.getY(); y < lastRoom.getY() + lastRoom.getHeight(); y++) {
+			at(lastRoom.getX(), y)->fill();
+			at(lastRoom.getX() + lastRoom.getWidth(), y)->fill();
+		}
 
-	// 	if (room.nearOtherRooms(roomDistance, rooms) || room.nearSide(2, size, size))
-	// 		continue;
 
-	// 	rooms.push_back(room);
+	while (rooms.size() < targetRoomCount) {
+		cout << "At start" << endl;
 
-	// 	for (int x = room.getX(); x < room.getX() + room.getWidth() + 1; x++) {
-	// 		if (x == room.getCenter().x)
-	// 			continue;
+		loopCount++;
+		if (loopCount > 500) {
+			break;
+		}
 
-	// 		at(x, room.getY())->fill();
-	// 		at(x, room.getY() + room.getHeight())->fill();
-	// 	}
+		int lastX;
+		int lastY;
+		int width = 5; //distSize(rng);
+		int height = 5; //distSize(rng);
+		int dir = distDirection(rng);
+		switch (dir) {
+			case 0: //right
+				cout << "Right" << endl;
+				lastX = lastRoom.getRight().x + 1;
+				lastY = lastRoom.getY();
+				break;
+			case 1: //left
+				cout << "Left" << endl;
+				lastX = lastRoom.getLeft().x - width - 1;
+				lastY = lastRoom.getY();			
+				break;
+			case 2: //top
+				cout << "Top" << endl;
+				lastX = lastRoom.getX();
+				lastY = lastRoom.getY() - height - 1;				
+				break;
+			case 3: //bottom
+				cout << "Bottom" << endl;
+				lastX = lastRoom.getX();
+				lastY = lastRoom.getBottom().y + 1;				
+				break;
+		}
 
-	// 	for (int y = room.getY(); y < room.getY() + room.getHeight(); y++) {
-	// 		if (y == room.getCenter().y)
-	// 			continue;
+		cout << lastX << ", " << lastY << endl;
 
-	// 		at(room.getX(), y)->fill();
-	// 		at(room.getX() + room.getWidth(), y)->fill();
-	// 	}
+		Room room(lastX, lastY, width, height);
 
-	// 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	// }
+		if (room.nearSide(2, size, size)) {
+			cout << "Too close to the side." << endl;
+			continue;
+		}
+		
+		if (at(room.getX(), room.getY())->getFilled()) {
+			cout << room.getX() << ", " << room.getY() << " is filled." << endl;
+			continue;
+		}
 
-	// diagonalMovement = false;
+		rooms.push_back(room);
+		lastRoom = room;
 
-	// //add connections
-	// for (int x = 0; x < size; x++)
-	// 	for (int y = 0; y < size; y++)
-	// 		addConnections(x, y);	
+		for (int x = room.getX(); x < room.getX() + room.getWidth() + 1; x++) {
+			at(x, room.getY())->fill();
+			at(x, room.getY() + room.getHeight())->fill();
+		}
 
-	// vector<shared_ptr<Tile>> corridorList;
-	// //add connections between the rooms
-	// for (Room room1 : rooms) {
-	// 	for (Room room2: rooms) {
-	// 		shared_ptr<Tile> node = getNode(room1.getCenter().x, room1.getCenter().y);
-	// 		shared_ptr<Tile> goal =getNode(room2.getCenter().x, room2.getCenter().y);
-	// 		vector<shared_ptr<Tile>> list = aStarTiles(node, goal);
-	// 		corridorList.insert(corridorList.end(), list.begin(), list.end());
-	// 		for (shared_ptr<Tile> tile : list) {
-	// 			//tile->setFillColor(sf::Color::Yellow);
-	// 			tile->clear();
-	// 			//get surrounding tiles
-	// 			for (Connection connection : tile->getConnections()) {
-	// 				shared_ptr<Tile> connectedTile = connection.getConnectedTile();
+		for (int y = room.getY(); y < room.getY() + room.getHeight(); y++) {
+			at(room.getX(), y)->fill();
+			at(room.getX() + room.getWidth(), y)->fill();
+		}
 
-	// 				bool insideRoom = false;
-	// 				for (Room room: rooms) {
-	// 					if (room.inside(connectedTile->getGridX(), connectedTile->getGridY())) {
-	// 						insideRoom = true;
-	// 						break;
-	// 					}
-	// 				}
+		//open way to other rooms
+		shared_ptr<Tile> topNode = at(lastRoom.getTop().x, lastRoom.getTop().y);
+		shared_ptr<Tile> aboveTopNode = at(lastRoom.getTop().x, lastRoom.getTop().y - 1);
+		if (topNode != nullptr && aboveTopNode != nullptr && aboveTopNode->getFilled()) {
+			topNode->clear();
+			aboveTopNode->clear();
+		}
+		
+		shared_ptr<Tile> bottomNode = at(lastRoom.getBottom().x, lastRoom.getBottom().y);
+		shared_ptr<Tile> belowBottomNode = at(lastRoom.getBottom().x, lastRoom.getBottom().y + 1);
+		if (bottomNode != nullptr && belowBottomNode != nullptr && belowBottomNode->getFilled()) {
+			bottomNode->clear();
+			belowBottomNode->clear();
+		}
 
-	// 				//if its not in the path list
-	// 				if ((std::find(corridorList.begin(), corridorList.end(), connectedTile) == corridorList.end()) && !insideRoom) {
-	// 					connectedTile->fill();
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+		shared_ptr<Tile> rightNode = at(lastRoom.getRight().x, lastRoom.getRight().y);
+		shared_ptr<Tile> rightOfRightNode = at(lastRoom.getRight().x + 1, lastRoom.getRight().y);
+		if (rightNode != nullptr && rightOfRightNode != nullptr && rightOfRightNode->getFilled()) {
+			rightNode->clear();
+			rightOfRightNode->clear();
+		}
 
-	// for (Room room : rooms) {
-	// 	shared_ptr<Tile> top = at(room.getCenter().x, room.getY());
-	// 	if (std::find(corridorList.begin(), corridorList.end(), top) == corridorList.end())
-	// 		top->fill();
+		shared_ptr<Tile> leftNode = at(lastRoom.getLeft().x, lastRoom.getLeft().y);
+		shared_ptr<Tile> leftOfLeftNode = at(lastRoom.getLeft().x - 1, lastRoom.getLeft().y);
+		if (leftNode != nullptr && leftOfLeftNode != nullptr && leftOfLeftNode->getFilled()) {
+			leftNode->clear();
+			leftOfLeftNode->clear();
+		}
 
-	// 	shared_ptr<Tile> bottom = at(room.getCenter().x, room.getY() + room.getHeight());
-	// 	if (std::find(corridorList.begin(), corridorList.end(), bottom) == corridorList.end())
-	// 		bottom->fill();
+		cout << "Sleeping..." << endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
 
-	// 	shared_ptr<Tile> left = at(room.getX(), room.getCenter().y);
-	// 	if (std::find(corridorList.begin(), corridorList.end(), left) == corridorList.end())
-	// 		left->fill();
-
-	// 	shared_ptr<Tile> right = at(room.getX() + room.getWidth(), room.getCenter().y);
-	// 	if (std::find(corridorList.begin(), corridorList.end(), right) == corridorList.end())
-	// 		right->fill();
-	// }
-			
-	// cout << "\nDone!" << endl;
-	// cout << "Loop count: " << loopCount << endl;
-	// cout << "Room count: " << rooms.size() << endl;
-
-	// for (int x = 0; x < size; x++)
-	// 	for (int y = 0; y < size; y++)
-	// 		at(x,y)->getConnections().clear();
-
-	// //diagonalMovement = true;
-	// //add connections
-	// for (int x = 0; x < size; x++)
-	// 	for (int y = 0; y < size; y++)
-	// 		addConnections(x, y);	
+	//add connections
+	for (int x = 0; x < size; x++)
+		for (int y = 0; y < size; y++)
+			addConnections(x, y);
 }
 
 void TileMap::save() {

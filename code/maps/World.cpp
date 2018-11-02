@@ -19,17 +19,17 @@ const int OPEN_TILE = 1;
 const int WIDTH = 640;
 const int HEIGHT = 480;
 const int TILE_AMOUNT = 128;
-vector<int> tileInts;
 shared_ptr<Tile> lastPlayerTile = nullptr;
 
 World::World() {
-	gameMap = new TileMap("res/proceduralMap.json", 1000);
-    window = new sf::RenderWindow(sf::VideoMode(WIDTH, HEIGHT), "Dungeon Crawler");
-    player = new Player("res/mage.png", "Player", 5, 6, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 2);
+	gameMap = new TileMap("res/mapGen.json", 128);
+    //window = new sf::RenderWindow(sf::VideoMode(WIDTH, HEIGHT), "Dungeon Crawler");
+	window = new sf::RenderWindow(sf::VideoMode(gameMap->getWidth(), gameMap->getHeight()), "Dungeon Crawler");
+    player = new Player("res/mage.png", "Player", 5, 6, 3, 3, gameMap, 1);
     skeleton = new Entity("res/skeleton.png", "Skeleton", 28, 28, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 1);
     skeleton2 = new Entity("res/skeleton.png", "Skeleton", 6, 6, gameMap->getTileSize().x, gameMap->getTileSize().y, gameMap, 1);
-	view.setSize(sf::Vector2f(500,500));
-	//gameMap->generate(4,4,3,2);
+	//view.setSize(sf::Vector2f(100,100));
+	
 
 	const std::chrono::nanoseconds FRAMETIME(16666667);		// Equal to 16.66ms or 1000/60
 	using clock = std::chrono::high_resolution_clock;
@@ -41,10 +41,9 @@ World::World() {
 	const int MAX_SKIP = 5;
 	int loopCount = 0;
 
-	for (int i = 0; i < 128; i++)
-		for (int j = 0; j < 128; j++)
-			tileInts.push_back(1);
-
+	std::thread thread(&TileMap::generate, gameMap, 500);
+	thread.detach();
+	//gameMap->generate(500);
 	while (window->isOpen())
 	{
 		
@@ -79,7 +78,7 @@ World::World() {
 		auto millisPassed = std::chrono::duration_cast<std::chrono::milliseconds>(timePassed);
 		// std::cout << "milliseconds passed: " << millisPassed.count() << std::endl;
 		// std::cout << "frames passed: " << m_frames << std::endl;
-		std::cout << "frames per second: "	<< (float) m_frames / ( (float)millisPassed.count() /1000.f) << endl;
+		//std::cout << "frames per second: "	<< (float) m_frames / ( (float)millisPassed.count() /1000.f) << endl;
 		// Render ever loop
 	}
 
@@ -217,55 +216,47 @@ void World::render() {
 	view.setCenter(player->getCenter().x, player->getCenter().y);
 	window->setView(view);
 
-	sf::Vector2f viewWorldPosition = view.getCenter();
-	float rectWidth = view.getSize().x;
-	float rectHeight = view.getSize().y;
-	float rectX = viewWorldPosition.x - rectWidth / 2;
-	float rectY = viewWorldPosition.y - rectHeight / 2;
+	// sf::Vector2f viewWorldPosition = view.getCenter();
+	// float rectWidth = view.getSize().x;
+	// float rectHeight = view.getSize().y;
+	// float rectX = viewWorldPosition.x - rectWidth / 2;
+	// float rectY = viewWorldPosition.y - rectHeight / 2;
 
-	int drawCount = 0;
+	// int drawCount = 0;
 
-	shared_ptr<Tile> playerTile = gameMap->findNode(player->getPosition());
-	if (playerTile != nullptr) {
-		lastPlayerTile = playerTile;
-	} else {
-		playerTile = lastPlayerTile;
-	}
+	// shared_ptr<Tile> playerTile = gameMap->findNode(player->getPosition());
+	// if (playerTile != nullptr) {
+	// 	lastPlayerTile = playerTile;
+	// } else {
+	// 	playerTile = lastPlayerTile;
+	// }
 
-	int bufferAmount = 30;
-	for (int x = playerTile->getGridX() - bufferAmount; x < playerTile->getGridX() + bufferAmount; x++) {
-		for (int y = playerTile->getGridY() - bufferAmount; y < playerTile->getGridY() + bufferAmount; y++) {
-			shared_ptr<Tile> tile = gameMap->at(x,y);
+	// int bufferAmount = 30;
+	// for (int x = playerTile->getGridX() - bufferAmount; x < playerTile->getGridX() + bufferAmount; x++) {
+	// 	for (int y = playerTile->getGridY() - bufferAmount; y < playerTile->getGridY() + bufferAmount; y++) {
+	// 		shared_ptr<Tile> tile = gameMap->at(x,y);
 			
-			if (tile == nullptr)
-				continue;
+	// 		if (tile == nullptr)
+	// 			continue;
 
-			float tileX = tile->getWorldX();
-			float tileY = tile->getWorldY();
+	// 		float tileX = tile->getWorldX();
+	// 		float tileY = tile->getWorldY();
 
-			if (tileX > rectX - gameMap->getTileSize().x && tileX < rectX + rectWidth && tileY > rectY - gameMap->getTileSize().y && tileY < rectY + rectHeight) {
-				window->draw(*tile);
-				window->draw(tile->getBorder());
-				drawCount++;
-			}
-		}
-	}
-	// for (auto const& tileEntry : gameMap->getNodes()) {
-	// 	shared_ptr<Tile> tile = tileEntry.second;
-		
-	// 	float tileX = tile->getWorldX();
-	// 	float tileY = tile->getWorldY();
-
-	// 	if (tileX > rectX && tileX < rectX + rectWidth - gameMap->getTileSize().x && tileY > rectY && tileY < rectY + rectHeight - gameMap->getTileSize().y) {
-	// 		window->draw(*tile);
-	// 		window->draw(tile->getBorder());
-	// 		drawCount++;
+	// 		if (tileX > rectX - gameMap->getTileSize().x && tileX < rectX + rectWidth && tileY > rectY - gameMap->getTileSize().y && tileY < rectY + rectHeight) {
+	// 			window->draw(*tile);
+	// 			window->draw(tile->getBorder());
+	// 			drawCount++;
+	// 		}
 	// 	}
 	// }
 
+	for (auto const& tileEntry : gameMap->getNodes()) {
+		shared_ptr<Tile> tile = tileEntry.second;
 
+		window->draw(*tile);
+		//window->draw(tile->getBorder());
+	}
 
-	cout << drawCount << endl;
 
 	if (debugLines.size() > 0) {
 		sf::Vertex lines[debugLines.size()];

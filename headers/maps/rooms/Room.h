@@ -72,6 +72,10 @@ public:
     bool inside(int x, int y);
 
     sf::Vector2f getCenter();
+    sf::Vector2f getTop();
+    sf::Vector2f getBottom();
+    sf::Vector2f getLeft();
+    sf::Vector2f getRight();
     int getX();
     int getY();
     int getWidth();
